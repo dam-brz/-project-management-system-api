@@ -1,6 +1,10 @@
 package com.dambrz.projectmanagementsystemapi.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
@@ -9,14 +13,29 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String projectName;
-    private String projectIdentifier;
-    private String description;
-    private Date start_date;
-    private Date end_date;
 
-    private Date create_At;
-    private Date updated_At;
+    @NotBlank(message = "Project name is required")
+    private String projectName;
+
+    @NotBlank(message = "Project identifier is required")
+    @Size(min = 4, max = 10, message = "Use 4 to 10 characters")
+    @Column(unique = true, updatable = false)
+    private String projectIdentifier;
+
+    @NotBlank(message = "Project description is required")
+    private String description;
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date startDate;
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date endDate;
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date createAt;
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date updatedAt;
 
     public Project() {
     }
@@ -53,46 +72,46 @@ public class Project {
         this.description = description;
     }
 
-    public Date getStart_date() {
-        return start_date;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setStart_date(Date start_date) {
-        this.start_date = start_date;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public Date getEnd_date() {
-        return end_date;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setEnd_date(Date end_date) {
-        this.end_date = end_date;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
-    public Date getCreate_At() {
-        return create_At;
+    public Date getCreateAt() {
+        return createAt;
     }
 
-    public void setCreate_At(Date create_At) {
-        this.create_At = create_At;
+    public void setCreateAt(Date createAt) {
+        this.createAt = createAt;
     }
 
-    public Date getUpdated_At() {
-        return updated_At;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdated_At(Date updated_At) {
-        this.updated_At = updated_At;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @PrePersist
     protected void onCreate() {
-        this.create_At = new Date();
+        this.createAt = new Date();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updated_At = new Date();
+        this.updatedAt = new Date();
     }
 
 }
