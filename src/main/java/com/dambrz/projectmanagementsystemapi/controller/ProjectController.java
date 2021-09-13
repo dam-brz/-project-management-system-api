@@ -6,10 +6,7 @@ import com.dambrz.projectmanagementsystemapi.service.ValidationErrorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -35,5 +32,13 @@ public class ProjectController {
         return new ResponseEntity<>(
                 projectService.saveOrUpdateProject(project),
                 HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{projectIdentifier}")
+    public ResponseEntity<?> getProjectByProjectIdentifier(@PathVariable String projectIdentifier) {
+
+        return new ResponseEntity<Project>(
+                projectService.findProjectByProjectIdentifier(projectIdentifier),
+                HttpStatus.OK);
     }
 }
