@@ -53,4 +53,17 @@ public class ProjectController {
 
         return new ResponseEntity<String>("Project with ID: " + projectIdentifier + " was deleted", HttpStatus.OK);
     }
+
+    @PutMapping("/{projectIdentifier}")
+    public ResponseEntity<?> updateProject(@PathVariable String projectIdentifier, @Valid @RequestBody Project project, BindingResult result) {
+        ResponseEntity<?> errorMap = validationErrorService.validate(result);
+        if (errorMap != null) {
+            return errorMap;
+        }
+
+        return new ResponseEntity<>(
+                projectService.updateProject(projectIdentifier, project),
+                HttpStatus.OK);
+    }
+
 }
