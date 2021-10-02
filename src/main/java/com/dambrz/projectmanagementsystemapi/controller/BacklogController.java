@@ -1,0 +1,41 @@
+package com.dambrz.projectmanagementsystemapi.controller;
+
+import com.dambrz.projectmanagementsystemapi.model.ProjectTask;
+import com.dambrz.projectmanagementsystemapi.service.ProjectTaskService;
+import com.dambrz.projectmanagementsystemapi.service.ValidationErrorService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@RestController
+@RequestMapping("/api/backlogs")
+@CrossOrigin
+public class BacklogController {
+
+    private final ProjectTaskService projectTaskService;
+
+    private final ValidationErrorService validationErrorService;
+
+    public BacklogController(ProjectTaskService projectTaskService, ValidationErrorService validationErrorService) {
+        this.projectTaskService = projectTaskService;
+        this.validationErrorService = validationErrorService;
+    }
+
+    @PostMapping("/{projectIdentifier}")
+    public ResponseEntity<?> addProjectTaskToBacklog(@Valid @RequestBody ProjectTask projectTask,
+                                                     BindingResult result,
+                                                     @PathVariable String projectIdentifier) {
+        ResponseEntity<?> errorMap = validationErrorService.validate(result);
+        if (errorMap != null) {
+            return errorMap;
+        }
+
+        ProjectTask task = projectTaskService.addProjectTask(projectIdentifier, projectTask);
+
+        return new ResponseEntity<ProjectTask>(task, HttpStatus.CREATED);
+    }
+
+}
