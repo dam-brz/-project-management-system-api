@@ -1,6 +1,7 @@
 package com.dambrz.projectmanagementsystemapi.service;
 
 import com.dambrz.projectmanagementsystemapi.exceptions.ProjectIdException;
+import com.dambrz.projectmanagementsystemapi.model.Backlog;
 import com.dambrz.projectmanagementsystemapi.model.Project;
 import com.dambrz.projectmanagementsystemapi.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,16 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
-    public Project saveOrUpdateProject(Project project) {
+    public Project save(Project project) {
         try{
             project.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+
+            if(project.getId()==null){
+                Backlog backlog = new Backlog();
+                project.setBacklog(backlog);
+                backlog.setProject(project);
+                backlog.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+            }
             return projectRepository.save(project);
         } catch (Exception e) {
             throw new ProjectIdException("Project ID " + project.getProjectIdentifier().toUpperCase() + " already exists");

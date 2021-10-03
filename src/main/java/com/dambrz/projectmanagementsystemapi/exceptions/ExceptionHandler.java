@@ -16,4 +16,10 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
         ProjectIdExceptionResponse projectIdExceptionResponse = new ProjectIdExceptionResponse(projectIdException.getMessage());
         return new ResponseEntity(projectIdExceptionResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler
+    public final ResponseEntity<Object> handleProjectNotFoundException(ProjectNotFoundException projectNotFoundException, WebRequest request) {
+        ProjectNotFoundExceptionResponse projectNotFoundExceptionResponse = new ProjectNotFoundExceptionResponse(projectNotFoundException.getMessage());
+        return new ResponseEntity(projectNotFoundExceptionResponse, HttpStatus.BAD_REQUEST);
+    }
 }
