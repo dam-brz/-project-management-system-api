@@ -7,6 +7,7 @@ import com.dambrz.projectmanagementsystemapi.repository.ProjectTaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProjectTaskService {
@@ -39,5 +40,9 @@ public class ProjectTaskService {
             projectTask.setStatus("TO_DO");
         }
         return projectTaskRepository.save(projectTask);
+    }
+
+    public Set<ProjectTask> findBacklogByProjectIdentifier(String projectIdentifier) {
+        return projectTaskRepository.findProjectTaskByProjectIdentifierOrderByPriority(projectIdentifier);
     }
 }
