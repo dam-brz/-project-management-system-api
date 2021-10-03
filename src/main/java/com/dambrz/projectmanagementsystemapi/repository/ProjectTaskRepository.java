@@ -9,4 +9,5 @@ import java.util.Set;
 @Repository
 public interface ProjectTaskRepository extends CrudRepository<ProjectTask, Long> {
     Set<ProjectTask> findProjectTaskByProjectIdentifierOrderByPriority(String projectIdentifier);
+    ProjectTask findProjectTaskByProjectSequence(String sequence);
 }
