@@ -93,4 +93,8 @@ public class ProjectTaskService {
         task.setSummary(updatedProjectTask.getSummary());
         return projectTaskRepository.save(task);
     }
+
+    public void deleteProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence) {
+        projectTaskRepository.delete(findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence));
+    }
 }
