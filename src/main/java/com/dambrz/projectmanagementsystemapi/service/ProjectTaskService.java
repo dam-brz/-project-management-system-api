@@ -82,4 +82,15 @@ public class ProjectTaskService {
 
         return task;
     }
+
+    public ProjectTask updateProjectTask(ProjectTask updatedProjectTask, String projectIdentifier, String projectTaskSequence) {
+
+        ProjectTask task = findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence);
+
+        task.setAcceptanceCriteria(updatedProjectTask.getAcceptanceCriteria());
+        task.setPriority(updatedProjectTask.getPriority());
+        task.setStatus(updatedProjectTask.getStatus());
+        task.setSummary(updatedProjectTask.getSummary());
+        return projectTaskRepository.save(task);
+    }
 }
