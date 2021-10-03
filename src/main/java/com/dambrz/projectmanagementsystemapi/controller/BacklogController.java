@@ -44,4 +44,10 @@ public class BacklogController {
         return projectTaskService.findBacklogByProjectIdentifier(projectIdentifier);
     }
 
+    @GetMapping ("/{projectIdentifier}/{projectTaskSequence}")
+    public ResponseEntity<?> getProjectTask(@PathVariable String projectIdentifier,
+                                            @PathVariable String projectTaskSequence)  {
+        return new ResponseEntity<ProjectTask>(projectTaskService.findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence), HttpStatus.CREATED);
+    }
+
 }
