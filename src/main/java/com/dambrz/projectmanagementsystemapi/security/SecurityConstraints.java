@@ -1,6 +1,6 @@
 package com.dambrz.projectmanagementsystemapi.security;
 
-public class AccessRules {
+public class SecurityConstraints {
 
     protected static final String[] STATIC_CONTENT = {
             "/",
@@ -14,8 +14,13 @@ public class AccessRules {
             "/**/*.js",
     };
 
-    protected static final String[] FOR_EVERYONE = {
+    protected static final String[] PERMIT_ALL_URLS = {
             "/api/users/**",
             "/h2-console/**"
     };
+
+    protected static final String SECRET = "SecreteKey";
+    protected static final String TOKEN_PREFIX = "Bearer ";
+    protected static final String HEADER_STRING = "Authorization";
+    protected static final long EXPIRATION_TIME = 30_000; //TESTS
 }
