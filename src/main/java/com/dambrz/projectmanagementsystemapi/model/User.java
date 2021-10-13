@@ -1,11 +1,14 @@
 package com.dambrz.projectmanagementsystemapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Date;
 
@@ -25,9 +28,11 @@ public class User implements UserDetails {
     private String fullName;
 
     @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Use min 6 characters")
     private String password;
 
     @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String confirmPassword;
 
     private Date createAt;
