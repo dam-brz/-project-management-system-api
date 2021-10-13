@@ -13,4 +13,9 @@ public class AccessRules {
             "/**/*.css",
             "/**/*.js",
     };
+
+    protected static final String[] FOR_EVERYONE = {
+            "/api/users/**",
+            "/h2-console/**"
+    };
 }
