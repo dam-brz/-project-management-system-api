@@ -1,5 +1,6 @@
 package com.dambrz.projectmanagementsystemapi.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -21,7 +22,10 @@ public class ProjectTask {
     private String acceptanceCriteria;
     private String status;
     private Integer priority;
+
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date dueDate;
+
     private Date createAt;
     private Date updatedAt;
 
