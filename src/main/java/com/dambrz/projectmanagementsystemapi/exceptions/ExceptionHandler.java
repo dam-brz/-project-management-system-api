@@ -22,4 +22,10 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
         ProjectNotFoundExceptionResponse projectNotFoundExceptionResponse = new ProjectNotFoundExceptionResponse(projectNotFoundException.getMessage());
         return new ResponseEntity(projectNotFoundExceptionResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler
+    public final ResponseEntity<Object> handleUsernameAlreadyExistsException(UsernameAlreadyExistsError usernameAlreadyExistsError, WebRequest request) {
+        UsernameAlreadyExistsResponse usernameAlreadyExistsResponse = new UsernameAlreadyExistsResponse(usernameAlreadyExistsError.getMessage());
+        return new ResponseEntity(usernameAlreadyExistsResponse, HttpStatus.BAD_REQUEST);
+    }
 }

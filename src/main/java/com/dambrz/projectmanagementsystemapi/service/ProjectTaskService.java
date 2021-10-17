@@ -46,7 +46,7 @@ public class ProjectTaskService {
             }
             return projectTaskRepository.save(projectTask);
         } catch (Exception e) {
-            throw new ProjectNotFoundException("Project Not Found.");
+            throw new ProjectNotFoundException("Project with ID: " + projectIdentifier + " Not Found.");
         }
     }
 
@@ -55,7 +55,7 @@ public class ProjectTaskService {
         Project project = projectRepository.findProjectByProjectIdentifier(projectIdentifier);
 
         if (project == null) {
-            throw new ProjectNotFoundException("Project Not Found.");
+            throw new ProjectNotFoundException("Project with ID: " + projectIdentifier + " Not Found.");
         }
 
         return projectTaskRepository.findProjectTaskByProjectIdentifierOrderByPriority(projectIdentifier);
