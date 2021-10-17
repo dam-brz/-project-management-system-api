@@ -1,8 +1,7 @@
 package com.dambrz.projectmanagementsystemapi.security;
 
 import com.dambrz.projectmanagementsystemapi.model.User;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -35,5 +34,28 @@ public class JWTProvider {
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
+            return true;
+        } catch (SignatureException ex) {
+            System.out.println("SIGNATURE Invalid JWT Signature");
+        } catch (MalformedJwtException ex) {
+            System.out.println("MALFORMED Invalid JWT Signature");
+        } catch (ExpiredJwtException ex) {
+            System.out.println("EXPIRED Invalid JWT Signature");
+        } catch (UnsupportedJwtException ex) {
+            System.out.println("UNSUPPORDED Invalid JWT Signature");
+        }
+        return false;
+    }
+
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
+        String id = (String) claims.get("id");
+
+        return Long.parseLong(id);
     }
 }
