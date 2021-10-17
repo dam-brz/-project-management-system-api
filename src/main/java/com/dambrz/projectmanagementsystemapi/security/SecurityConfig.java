@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static com.dambrz.projectmanagementsystemapi.security.SecurityConstraints.PERMIT_ALL_URLS;
 import static com.dambrz.projectmanagementsystemapi.security.SecurityConstraints.STATIC_CONTENT;
@@ -27,10 +28,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationEntryPoint unauthorisedHandler;
     private final CustomUserDetailsService userDetailsService;
+    private final JWTProvider jwtProvider;
 
-    public SecurityConfig(JwtAuthenticationEntryPoint unauthorisedHandler, CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthenticationEntryPoint unauthorisedHandler, CustomUserDetailsService userDetailsService, JWTProvider jwtProvider) {
         this.unauthorisedHandler = unauthorisedHandler;
         this.userDetailsService = userDetailsService;
+        this.jwtProvider = jwtProvider;
     }
 
     @Override
@@ -60,10 +63,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(PERMIT_ALL_URLS).permitAll()
                 .anyRequest().authenticated();
 
+        http.addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);
+
     }
 
     @Bean
     BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    JwtAuthFilter authFilter() {
+        return new JwtAuthFilter(jwtProvider, userDetailsService);
     }
 }
