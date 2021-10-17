@@ -11,6 +11,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Proxy(lazy=false)
@@ -35,6 +37,11 @@ public class User implements UserDetails {
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String confirmPassword;
+
+    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "user", orphanRemoval = true)
+    private Set<Project> projects = new HashSet<>();
+
+    private String projectLeader;
 
     private Date createAt;
     private Date updatedAt;
@@ -77,6 +84,14 @@ public class User implements UserDetails {
 
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
+    }
+
+    public Set<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<Project> projects) {
+        this.projects = projects;
     }
 
     public Date getCreateAt() {
