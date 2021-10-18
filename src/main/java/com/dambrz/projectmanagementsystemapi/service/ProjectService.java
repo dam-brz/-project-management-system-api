@@ -1,6 +1,7 @@
 package com.dambrz.projectmanagementsystemapi.service;
 
 import com.dambrz.projectmanagementsystemapi.exceptions.ProjectIdException;
+import com.dambrz.projectmanagementsystemapi.exceptions.ProjectNotFoundException;
 import com.dambrz.projectmanagementsystemapi.model.Backlog;
 import com.dambrz.projectmanagementsystemapi.model.Project;
 import com.dambrz.projectmanagementsystemapi.model.User;
@@ -40,11 +41,18 @@ public class ProjectService {
         }
     }
 
-    public Project findProjectByProjectIdentifier(String projectIdentifier) {
+    public Project findProjectByProjectIdentifier(String projectIdentifier, String username) {
+
         Project project = projectRepository.findProjectByProjectIdentifier(projectIdentifier.toUpperCase());
         if (project == null) {
             throw new ProjectIdException("Project ID: " + projectIdentifier + " doesn't exists");
         }
+
+        if (!project.getProjectLeader().equals(username)) {
+            throw new ProjectNotFoundException("Project not found in your account");
+        }
+
+
 
         return project;
     }
@@ -53,12 +61,8 @@ public class ProjectService {
         return projectRepository.findAllByProjectLeader(projectLeaderName);
     }
 
-    public void deleteProjectByIdentifier(String projectIdentifier) {
-        Project project = projectRepository.findProjectByProjectIdentifier(projectIdentifier.toUpperCase());
-        if (project == null) {
-            throw new ProjectIdException("Project ID: " + projectIdentifier + " doesn't exists");
-        }
-        projectRepository.delete(project);
+    public void deleteProjectByIdentifier(String projectIdentifier, Principal principal) {
+        projectRepository.delete(findProjectByProjectIdentifier(projectIdentifier, principal.getName()));
     }
 
     public Project updateProject(String projectIdentifier, Project project) {
