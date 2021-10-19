@@ -57,14 +57,14 @@ public class ProjectController {
     }
 
     @PutMapping("/{projectIdentifier}")
-    public ResponseEntity<?> updateProject(@PathVariable String projectIdentifier, @Valid @RequestBody Project project, BindingResult result) {
+    public ResponseEntity<?> updateProject(@PathVariable String projectIdentifier, @Valid @RequestBody Project project, BindingResult result, Principal principal) {
         ResponseEntity<?> errorMap = validationErrorService.validate(result);
         if (errorMap != null) {
             return errorMap;
         }
 
         return new ResponseEntity<>(
-                projectService.updateProject(projectIdentifier, project),
+                projectService.updateProject(projectIdentifier, project, principal.getName()),
                 HttpStatus.OK);
     }
 

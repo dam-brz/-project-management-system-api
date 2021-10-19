@@ -52,8 +52,6 @@ public class ProjectService {
             throw new ProjectNotFoundException("Project not found in your account");
         }
 
-
-
         return project;
     }
 
@@ -65,9 +63,10 @@ public class ProjectService {
         projectRepository.delete(findProjectByProjectIdentifier(projectIdentifier, principal.getName()));
     }
 
-    public Project updateProject(String projectIdentifier, Project project) {
+    public Project updateProject(String projectIdentifier, Project project, String username) {
         Project projectToUpdate = projectRepository.findProjectByProjectIdentifier(projectIdentifier);
-        if (projectToUpdate == null) {
+
+        if (projectToUpdate == null || !projectToUpdate.getProjectLeader().equals(username)) {
             throw new ProjectIdException("Project ID: " + projectIdentifier + " doesn't exists");
         }
 
