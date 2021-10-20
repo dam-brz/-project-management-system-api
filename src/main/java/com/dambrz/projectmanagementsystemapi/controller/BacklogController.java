@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.Set;
 
 @RestController
@@ -28,48 +29,57 @@ public class BacklogController {
     @PostMapping("/{projectIdentifier}")
     public ResponseEntity<?> addProjectTaskToBacklog(@Valid @RequestBody ProjectTask projectTask,
                                                      BindingResult result,
-                                                     @PathVariable String projectIdentifier) {
+                                                     @PathVariable String projectIdentifier,
+                                                     Principal principal) {
         ResponseEntity<?> errorMap = validationErrorService.validate(result);
         if (errorMap != null) {
             return errorMap;
         }
 
-        ProjectTask task = projectTaskService.addProjectTask(projectIdentifier, projectTask);
+        ProjectTask task = projectTaskService.addProjectTask(projectIdentifier, projectTask, principal.getName());
 
-        return new ResponseEntity<ProjectTask>(task, HttpStatus.CREATED);
+        return new ResponseEntity<>(task, HttpStatus.CREATED);
     }
 
-    @GetMapping ("/{projectIdentifier}")
-    public Set<ProjectTask> getProjectBacklog(@PathVariable String projectIdentifier) {
-        return projectTaskService.findBacklogByProjectIdentifier(projectIdentifier);
+    @GetMapping("/{projectIdentifier}")
+    public Set<ProjectTask> getProjectBacklog(@PathVariable String projectIdentifier,
+                                              Principal principal) {
+
+        return projectTaskService.findBacklogByProjectIdentifier(projectIdentifier, principal.getName());
     }
 
-    @GetMapping ("/{projectIdentifier}/{projectTaskSequence}")
+    @GetMapping("/{projectIdentifier}/{projectTaskSequence}")
     public ResponseEntity<?> getProjectTask(@PathVariable String projectIdentifier,
-                                            @PathVariable String projectTaskSequence)  {
-        return new ResponseEntity<ProjectTask>(projectTaskService.findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence), HttpStatus.CREATED);
+                                            @PathVariable String projectTaskSequence,
+                                            Principal principal) {
+
+        ProjectTask task = projectTaskService.findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, principal.getName());
+        return new ResponseEntity<>(task, HttpStatus.CREATED);
     }
 
     @PutMapping("/{projectIdentifier}/{projectTaskSequence}")
     public ResponseEntity<?> updateProjectTask(@Valid @RequestBody ProjectTask updatedProjectTask,
                                                BindingResult result,
                                                @PathVariable String projectIdentifier,
-                                               @PathVariable String projectTaskSequence) {
+                                               @PathVariable String projectTaskSequence,
+                                               Principal principal) {
 
         ResponseEntity<?> errorMap = validationErrorService.validate(result);
         if (errorMap != null) {
             return errorMap;
         }
 
-        ProjectTask projectTask = projectTaskService.updateProjectTask(updatedProjectTask, projectIdentifier, projectTaskSequence);
+        ProjectTask projectTask = projectTaskService.updateProjectTask(updatedProjectTask, projectIdentifier, projectTaskSequence, principal.getName());
 
-        return new ResponseEntity<ProjectTask>(projectTask, HttpStatus.OK);
+        return new ResponseEntity<>(projectTask, HttpStatus.OK);
     }
 
     @DeleteMapping("/{projectIdentifier}/{projectTaskSequence}")
-    public ResponseEntity<?> deleteProjectTask(@PathVariable String projectIdentifier, @PathVariable String projectTaskSequence) {
+    public ResponseEntity<?> deleteProjectTask(@PathVariable String projectIdentifier,
+                                               @PathVariable String projectTaskSequence,
+                                               Principal principal) {
 
-        projectTaskService.deleteProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence);
-        return new ResponseEntity<String>("Project Task with ID: " + projectTaskSequence + " was deleted", HttpStatus.OK);
+        projectTaskService.deleteProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, principal.getName());
+        return new ResponseEntity<>("Project Task with ID: " + projectTaskSequence + " was deleted", HttpStatus.OK);
     }
 }

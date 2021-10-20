@@ -17,17 +17,19 @@ public class ProjectTaskService {
     private final BacklogRepository backlogRepository;
     private final ProjectTaskRepository projectTaskRepository;
     private final ProjectRepository projectRepository;
+    private final ProjectService projectService;
 
-    public ProjectTaskService(BacklogRepository backlogRepository, ProjectTaskRepository projectTaskRepository, ProjectRepository projectRepository) {
+    public ProjectTaskService(BacklogRepository backlogRepository, ProjectTaskRepository projectTaskRepository, ProjectRepository projectRepository, ProjectService projectService) {
         this.backlogRepository = backlogRepository;
         this.projectTaskRepository = projectTaskRepository;
         this.projectRepository = projectRepository;
+        this.projectService = projectService;
     }
 
-    public ProjectTask addProjectTask(String projectIdentifier, ProjectTask projectTask) {
+    public ProjectTask addProjectTask(String projectIdentifier, ProjectTask projectTask, String username) {
 
         try {
-            Backlog backlog = backlogRepository.findBacklogByProjectIdentifier(projectIdentifier);
+            Backlog backlog = projectService.findProjectByProjectIdentifier(projectIdentifier, username).getBacklog();
             projectTask.setBacklog(backlog);
 
             int backlogSequence = backlog.getPTSequence();
@@ -50,24 +52,16 @@ public class ProjectTaskService {
         }
     }
 
-    public Set<ProjectTask> findBacklogByProjectIdentifier(String projectIdentifier) {
+    public Set<ProjectTask> findBacklogByProjectIdentifier(String projectIdentifier, String username) {
 
-        Project project = projectRepository.findProjectByProjectIdentifier(projectIdentifier);
-
-        if (project == null) {
-            throw new ProjectNotFoundException("Project with ID: " + projectIdentifier + " Not Found.");
-        }
-
+        projectService.findProjectByProjectIdentifier(projectIdentifier, username);
         return projectTaskRepository.findProjectTaskByProjectIdentifierOrderByPriority(projectIdentifier);
     }
 
-    public ProjectTask findProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence) {
+    public ProjectTask findProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence, String username) {
 
         //make sure that searching for existing backlog
-        Backlog backlog = backlogRepository.findBacklogByProjectIdentifier(projectIdentifier);
-        if (backlog == null) {
-            throw new ProjectNotFoundException("Project Not Found.");
-        }
+        projectService.findProjectByProjectIdentifier(projectIdentifier, username);
 
         //make sure that task exist
         ProjectTask task = projectTaskRepository.findProjectTaskByProjectSequence(projectTaskSequence);
@@ -83,9 +77,9 @@ public class ProjectTaskService {
         return task;
     }
 
-    public ProjectTask updateProjectTask(ProjectTask updatedProjectTask, String projectIdentifier, String projectTaskSequence) {
+    public ProjectTask updateProjectTask(ProjectTask updatedProjectTask, String projectIdentifier, String projectTaskSequence, String username) {
 
-        ProjectTask task = findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence);
+        ProjectTask task = findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, username);
 
         task.setAcceptanceCriteria(updatedProjectTask.getAcceptanceCriteria());
         task.setPriority(updatedProjectTask.getPriority());
@@ -94,7 +88,7 @@ public class ProjectTaskService {
         return projectTaskRepository.save(task);
     }
 
-    public void deleteProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence) {
-        projectTaskRepository.delete(findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence));
+    public void deleteProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence, String username) {
+        projectTaskRepository.delete(findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, username));
     }
 }
