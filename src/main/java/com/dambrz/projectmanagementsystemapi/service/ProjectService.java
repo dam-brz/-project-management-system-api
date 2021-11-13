@@ -44,9 +44,9 @@ public class ProjectService {
     public Project findProjectByProjectIdentifier(String projectIdentifier, String username) {
 
         Project project = projectRepository.findProjectByProjectIdentifier(projectIdentifier.toUpperCase());
-        if (project == null) {
+        if (project == null)
             throw new ProjectIdException("Project ID: " + projectIdentifier + " doesn't exists");
-        }
+
 
         if (!project.getProjectLeader().equals(username)) {
             throw new ProjectNotFoundException("Project not found in your account");
@@ -59,8 +59,8 @@ public class ProjectService {
         return projectRepository.findAllByProjectLeader(projectLeaderName);
     }
 
-    public void deleteProjectByIdentifier(String projectIdentifier, Principal principal) {
-        projectRepository.delete(findProjectByProjectIdentifier(projectIdentifier, principal.getName()));
+    public void deleteProjectByIdentifier(String projectIdentifier, String username) {
+        projectRepository.delete(findProjectByProjectIdentifier(projectIdentifier, username));
     }
 
     public Project updateProject(String projectIdentifier, Project project, String username) {
