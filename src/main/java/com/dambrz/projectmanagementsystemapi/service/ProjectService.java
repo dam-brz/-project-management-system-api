@@ -9,8 +9,6 @@ import com.dambrz.projectmanagementsystemapi.repository.ProjectRepository;
 import com.dambrz.projectmanagementsystemapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
-
 @Service
 public class ProjectService {
 
@@ -59,8 +57,8 @@ public class ProjectService {
         return projectRepository.findAllByProjectLeader(projectLeaderName);
     }
 
-    public void deleteProjectByIdentifier(String projectIdentifier, Principal principal) {
-        projectRepository.delete(findProjectByProjectIdentifier(projectIdentifier, principal.getName()));
+    public void deleteProjectByIdentifier(String projectIdentifier, String username) {
+        projectRepository.delete(findProjectByProjectIdentifier(projectIdentifier, username));
     }
 
     public Project updateProject(String projectIdentifier, Project project, String username) {

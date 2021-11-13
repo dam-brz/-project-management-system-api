@@ -2,10 +2,7 @@ package com.dambrz.projectmanagementsystemapi.service;
 
 import com.dambrz.projectmanagementsystemapi.exceptions.ProjectNotFoundException;
 import com.dambrz.projectmanagementsystemapi.model.Backlog;
-import com.dambrz.projectmanagementsystemapi.model.Project;
 import com.dambrz.projectmanagementsystemapi.model.ProjectTask;
-import com.dambrz.projectmanagementsystemapi.repository.BacklogRepository;
-import com.dambrz.projectmanagementsystemapi.repository.ProjectRepository;
 import com.dambrz.projectmanagementsystemapi.repository.ProjectTaskRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +11,11 @@ import java.util.Set;
 @Service
 public class ProjectTaskService {
 
-    private final BacklogRepository backlogRepository;
     private final ProjectTaskRepository projectTaskRepository;
-    private final ProjectRepository projectRepository;
     private final ProjectService projectService;
 
-    public ProjectTaskService(BacklogRepository backlogRepository, ProjectTaskRepository projectTaskRepository, ProjectRepository projectRepository, ProjectService projectService) {
-        this.backlogRepository = backlogRepository;
+    public ProjectTaskService(ProjectTaskRepository projectTaskRepository, ProjectService projectService) {
         this.projectTaskRepository = projectTaskRepository;
-        this.projectRepository = projectRepository;
         this.projectService = projectService;
     }
 
