@@ -10,10 +10,16 @@ import com.dambrz.projectmanagementsystemapi.repository.ProjectTaskRepository;
 import com.dambrz.projectmanagementsystemapi.repository.UserRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
+import java.util.stream.Stream;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ActiveProfiles("test")
 @ExtendWith(value = SpringExtension.class)
@@ -27,6 +33,8 @@ public abstract class TestHelper {
     protected ProjectTaskRepository projectTaskRepository;
     @Autowired
     protected BacklogRepository backlogRepository;
+    @Autowired
+    protected MockMvc mockMvc;
 
     protected User createValidSampleUser() {
         User user = new User();
@@ -103,5 +111,52 @@ public abstract class TestHelper {
         projectTask1.setPriority(1);
 
         return projectTask1;
+    }
+
+    protected String getValidUserAsJsonString() {
+        return "{\"username\":\"sample@user.com\",\"fullName\":\"Sample User\"," +
+                "\"password\":\"password\",\"confirmPassword\":\"password\"}";
+    }
+
+    protected static Stream<String> getInvalidUsersAsJson() {
+        return Stream.of(
+                "{\"username\":\"sample@user.com\",\"fullName\":\"Sample User\"," +
+                        "\"password\":\"notMatchPassword\",\"confirmPassword\":\"password\"}",
+                "{\"fullName\":\"Sample User\",\"password\":\"password\"," +
+                        "\"confirmPassword\":\"password\"}",
+                "{\"username\":\"sample@user.com\",\"password\":\"notMatchPassword\"," +
+                        "\"confirmPassword\":\"password\"}",
+                "{\"username\":\"sample@user.com\",\"fullName\":\"Sample User\"," +
+                        "\"password\":\"password\",\"confirmPassword\":\"password\"}",
+                ""
+        );
+    }
+
+    protected String getValidLoginRequestAsJsonString() {
+        return "{\"username\":\"sample@user.com\",\"password\":\"password\"}";
+    }
+
+    protected static Stream<String> getInvalidLoginRequestsAsJson() {
+        return Stream.of(
+                "{\"username\":\"sample@user.com\",\"password\":\"invalidPassword\"}",
+                "{\"username\":\"invalid@user.com\",\"password\":\"password\"}",
+                "{\"username\":\"invalid@user.com\"}",
+                "{\"password\":\"password\"}",
+                ""
+        );
+    }
+
+    protected ResultActions performRegister(String userAsJsonString) throws Exception {
+        return mockMvc.perform(
+                post("/api/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJsonString));
+    }
+
+    protected ResultActions performLogin(String userAsJsonString) throws Exception {
+        return mockMvc.perform(
+                post("/api/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userAsJsonString));
     }
 }
