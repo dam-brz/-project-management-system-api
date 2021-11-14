@@ -46,6 +46,16 @@ public class User implements UserDetails {
     private Date createAt;
     private Date updatedAt;
 
+    public User() {
+    }
+
+    public User(String username, String fullName, String password, String confirmPassword) {
+        this.username = username;
+        this.fullName = fullName;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+    }
+
     public Long getId() {
         return id;
     }
