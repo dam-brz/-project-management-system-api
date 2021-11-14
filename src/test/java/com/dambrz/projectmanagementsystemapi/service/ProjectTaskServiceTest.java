@@ -8,17 +8,16 @@ import com.dambrz.projectmanagementsystemapi.model.Project;
 import com.dambrz.projectmanagementsystemapi.model.ProjectTask;
 import com.dambrz.projectmanagementsystemapi.model.User;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ProjectTaskServiceTest extends TestHelper {
 
     @Autowired
@@ -26,13 +25,18 @@ class ProjectTaskServiceTest extends TestHelper {
     @Autowired
     private ProjectService projectService;
 
+    @BeforeEach
+    void clearDb() {
+        userRepository.deleteAll();
+        projectRepository.deleteAll();
+        backlogRepository.deleteAll();
+    }
+
     @Test
     void addProjectTask() {
         User user = userRepository.save(createValidSampleUser());
         Project project = projectService.save(createValidSampleProject(), user.getUsername());
-        Backlog backlog = backlogRepository.save(createValidSampleBacklog());
-        ProjectTask projectTask = createInvalidSampleProjectTask();
-        projectTask.setBacklog(backlog);
+        ProjectTask projectTask = createValidSampleProjectTask();
         ProjectTask validProjectTask = projectTaskService.addProjectTask(project.getProjectIdentifier(), projectTask, user.getUsername());
         assertThat(validProjectTask).isNotNull();
     }
@@ -137,7 +141,6 @@ class ProjectTaskServiceTest extends TestHelper {
         Assertions
                 .assertThrows(ProjectIdException.class, () -> projectTaskService.findProjectTaskByProjectTaskSequence(projectIdentifier, projectSequence, username));
     }
-
 
     @Test
     void updateProjectTask() {
