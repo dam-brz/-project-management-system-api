@@ -6,22 +6,26 @@ import com.dambrz.projectmanagementsystemapi.exceptions.ProjectNotFoundException
 import com.dambrz.projectmanagementsystemapi.model.Project;
 import com.dambrz.projectmanagementsystemapi.model.User;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-//import org.springframework.test.annotation.DirtiesContext;
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ProjectServiceTest extends TestHelper {
 
     @Autowired
     private ProjectService projectService;
+
+    @BeforeEach
+    void clearDb() {
+        userRepository.deleteAll();
+        projectRepository.deleteAll();
+    }
 
     @Test
     void save() {

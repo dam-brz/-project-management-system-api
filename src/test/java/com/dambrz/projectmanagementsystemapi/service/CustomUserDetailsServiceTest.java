@@ -3,21 +3,25 @@ package com.dambrz.projectmanagementsystemapi.service;
 import com.dambrz.projectmanagementsystemapi.TestHelper;
 import com.dambrz.projectmanagementsystemapi.model.User;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CustomUserDetailsServiceTest extends TestHelper {
 
     @Autowired
     protected CustomUserDetailsService userDetailsService;
+
+    @BeforeEach
+    void clearDb() {
+        userRepository.deleteAll();
+    }
 
     @Test
     void loadUserByUsername() {

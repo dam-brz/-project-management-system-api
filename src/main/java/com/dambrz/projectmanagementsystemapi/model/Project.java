@@ -51,6 +51,19 @@ public class Project {
     public Project() {
     }
 
+    public Project(String projectName, String projectIdentifier, String description) {
+        this.projectName = projectName;
+        this.projectIdentifier = projectIdentifier;
+        this.description = description;
+    }
+
+    public Project(String projectName, String projectIdentifier, String description, String projectLeader) {
+        this.projectName = projectName;
+        this.projectIdentifier = projectIdentifier;
+        this.description = description;
+        this.projectLeader = projectLeader;
+    }
+
     public Long getId() {
         return id;
     }

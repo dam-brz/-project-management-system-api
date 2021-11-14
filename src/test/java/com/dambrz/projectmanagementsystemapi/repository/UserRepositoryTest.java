@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
-//import org.springframework.test.annotation.DirtiesContext;
 
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -14,23 +13,16 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class UserRepositoryTest extends TestHelper {
 
     @Test
     void shouldSaveUser() {
-        User user = createValidSampleUser();
-        User savedUser = userRepository.save(user);
-        assertThat(savedUser)
-                .usingRecursiveComparison()
-                .ignoringFields("id")
-                .isEqualTo(user);
+        assertThat(userRepository.save(createValidSampleUser())).isNotNull();
     }
 
     @Test
     void shouldThrowsConstraintViolationException() {
-        User user = createValidSampleUser();
-        user.setUsername(null);
+        User user = createInValidSampleUser();
         Assertions.assertThrows(ConstraintViolationException.class, () -> userRepository.save(user));
     }
 
@@ -38,8 +30,10 @@ class UserRepositoryTest extends TestHelper {
     void shouldGetExistingUserByUsername() {
         List<User> users = createSampleUsersList();
         userRepository.saveAll(users);
-        User existingUser = userRepository.findByUsername(users.get(1).getUsername());
-        assertThat(existingUser).isEqualTo(users.get(1));
+        assertThat(userRepository.findByUsername(users.get(0).getUsername()))
+                .usingRecursiveComparison()
+                .ignoringFields("id", "createAt", "confirmPassword")
+                .isEqualTo(users.get(0));
     }
 
     @Test
@@ -54,8 +48,10 @@ class UserRepositoryTest extends TestHelper {
     void shouldGetExistingUserById() {
         List<User> users = createSampleUsersList();
         List<User> savedUsers = (List<User>) userRepository.saveAll(users);
-        User existingUser = userRepository.getById(savedUsers.get(1).getId());
-        assertThat(existingUser).isEqualTo(users.get(1));
+        assertThat(userRepository.getById(savedUsers.get(1).getId()))
+                .usingRecursiveComparison()
+                .ignoringFields("id", "projects", "createAt", "confirmPassword")
+                .isEqualTo(users.get(1));
     }
 
     @Test
