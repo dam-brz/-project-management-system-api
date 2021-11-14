@@ -8,21 +8,13 @@ import com.dambrz.projectmanagementsystemapi.repository.BacklogRepository;
 import com.dambrz.projectmanagementsystemapi.repository.ProjectRepository;
 import com.dambrz.projectmanagementsystemapi.repository.ProjectTaskRepository;
 import com.dambrz.projectmanagementsystemapi.repository.UserRepository;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
 @ActiveProfiles("test")
-@ExtendWith(value = SpringExtension.class)
 public abstract class TestHelper {
 
     @Autowired
@@ -33,84 +25,70 @@ public abstract class TestHelper {
     protected ProjectTaskRepository projectTaskRepository;
     @Autowired
     protected BacklogRepository backlogRepository;
-    @Autowired
-    protected MockMvc mockMvc;
 
     protected User createValidSampleUser() {
-        User user = new User();
-        user.setUsername("sample@user.com");
-        user.setFullName("Sample User");
-        user.setPassword("password");
-        user.setConfirmPassword("password");
+        return new User("sample@user.com", "Sample User", "password", "password");
+    }
 
-        return user;
+    protected User createInValidSampleUser() {
+        return new User(null, "Sample User", "password", "password");
     }
 
     protected List<User> createSampleUsersList() {
-        User user = new User();
-        user.setUsername("user1@sample.com");
-        user.setFullName("User1 User");
-        user.setPassword("password");
-        user.setConfirmPassword("password");
-
-        User user2 = new User();
-        user2.setUsername("user2@sample.com");
-        user2.setFullName("User2 User");
-        user2.setPassword("password");
-        user2.setConfirmPassword("password");
-
-        User user3 = new User();
-        user3.setUsername("user3@sample.com");
-        user3.setFullName("User3 User");
-        user3.setPassword("password");
-        user3.setConfirmPassword("password");
-        return List.of(user, user2, user3);
+        return List.of(
+                new User("sample1@user.com", "Sample1 User1", "password", "password"),
+                new User("sample2@user.com", "Sample2 User2", "password", "password"),
+                new User("sample3@user.com", "Sample3 User3", "password", "password")
+        );
     }
 
     protected Project createValidSampleProject() {
-        Project project = new Project();
-        project.setProjectIdentifier("TEST");
-        project.setProjectName("TEST");
-        project.setDescription("Test description");
+        return new Project("TEST", "TEST", "Test description");
+    }
 
-        return project;
+    protected static Stream<Project> createSampleInvalidProjectsList() {
+        return Stream.of(
+                new Project(null, "TEST1", "Test description1", "sample1@user.com"),
+                new Project("", "TEST1", "Test description1", "sample1@user.com"),
+                new Project("TEST2", null, "Test description2", "sample2@user.com"),
+                new Project("TEST3", "TES", "Test description3", "sample3@user.com"),
+                new Project("TEST3", "testTestTest", "Test description3", "sample3@user.com"),
+                new Project("TEST3", "", "Test description3", "sample3@user.com")
+        );
     }
 
     protected List<Project> createSampleProjectsList() {
-        Project project1 = new Project();
-        project1.setProjectIdentifier("TEST1");
-        project1.setProjectName("TEST1");
-        project1.setDescription("Test1 description");
-        project1.setProjectLeader("user1@sample.com");
+        return List.of(
+                new Project("TEST1", "TEST1", "Test description1", "sample1@user.com"),
+                new Project("TEST2", "TEST2", "Test description2", "sample2@user.com"),
+                new Project("TEST3", "TEST3", "Test description3", "sample3@user.com")
+        );
+    }
 
-        Project project2 = new Project();
-        project2.setProjectIdentifier("TEST2");
-        project2.setProjectName("TEST2");
-        project2.setDescription("Test2 description");
-        project2.setProjectLeader("user2@sample.com");
-
-
-        Project project3 = new Project();
-        project3.setProjectIdentifier("TEST3");
-        project3.setProjectName("TEST3");
-        project3.setDescription("Test3 description");
-        project3.setProjectLeader("user3@sample.com");
-
-        return List.of(project1, project2, project3);
+    protected List<Project> getSampleProjectsList(Iterable<Project> projects) {
+        return (List<Project>) projects;
     }
 
     protected Backlog createValidSampleBacklog() {
         return new Backlog();
     }
 
-    protected ProjectTask createInvalidSampleProjectTask() {
-        ProjectTask projectTask1 = new ProjectTask();
-        projectTask1.setProjectIdentifier("TEST");
-        projectTask1.setSummary("TEST SUMMARY");
-        projectTask1.setProjectSequence("TEST1-1");
-        projectTask1.setPriority(1);
+    protected ProjectTask createValidSampleProjectTask() {
+        Backlog backlog = backlogRepository.save(new Backlog());
+        return new ProjectTask("TEST-1", "Test summary", 1, "TEST1", backlog);
+    }
 
-        return projectTask1;
+    protected ProjectTask createInvalidSampleProjectTask() {
+        return new ProjectTask("TEST-1", "Test summary", 1, "TEST1");
+    }
+
+    protected List<ProjectTask> createProjectTaskList() {
+        Backlog backlog = backlogRepository.save(new Backlog());
+        return List.of(
+                new ProjectTask("TEST-1", "Test summary1", 1, "TEST1", backlog),
+                new ProjectTask("TEST-2", "Test summary2", 1, "TEST1", backlog),
+                new ProjectTask("TEST-3", "Test summary3", 1, "TEST1", backlog)
+        );
     }
 
     protected String getValidUserAsJsonString() {
@@ -144,19 +122,5 @@ public abstract class TestHelper {
                 "{\"password\":\"password\"}",
                 ""
         );
-    }
-
-    protected ResultActions performRegister(String userAsJsonString) throws Exception {
-        return mockMvc.perform(
-                post("/api/users/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userAsJsonString));
-    }
-
-    protected ResultActions performLogin(String userAsJsonString) throws Exception {
-        return mockMvc.perform(
-                post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userAsJsonString));
     }
 }
