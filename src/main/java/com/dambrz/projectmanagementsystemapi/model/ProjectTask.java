@@ -40,6 +40,21 @@ public class ProjectTask {
     public ProjectTask() {
     }
 
+    public ProjectTask(String projectSequence, String summary, Integer priority, String projectIdentifier) {
+        this.projectSequence = projectSequence;
+        this.summary = summary;
+        this.priority = priority;
+        this.projectIdentifier = projectIdentifier;
+    }
+
+    public ProjectTask(String projectSequence, String summary, Integer priority, String projectIdentifier, Backlog backlog) {
+        this.projectSequence = projectSequence;
+        this.summary = summary;
+        this.priority = priority;
+        this.projectIdentifier = projectIdentifier;
+        this.backlog = backlog;
+    }
+
     public Long getId() {
         return id;
     }
