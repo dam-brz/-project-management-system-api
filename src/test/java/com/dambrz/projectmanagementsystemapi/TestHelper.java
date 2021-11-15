@@ -10,9 +10,12 @@ import com.dambrz.projectmanagementsystemapi.repository.ProjectTaskRepository;
 import com.dambrz.projectmanagementsystemapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 import java.util.stream.Stream;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 public abstract class TestHelper {
@@ -122,5 +125,44 @@ public abstract class TestHelper {
                 "{\"password\":\"password\"}",
                 ""
         );
+    }
+
+    protected String getValidProjectAsJsonString() {
+        return "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"TEST\",\"description\":\"Test description\"}";
+    }
+
+    protected static Stream<String> getInvalidProjectsAsJson() {
+        return Stream.of(
+                "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"\",\"description\":\"Test description\"}",
+                "{\"projectIdentifier\":\"TEST2\",\"description\":\"Test description\"}",
+                "{\"projectIdentifier\":\"TEST3\",\"projectName\":\"TEST\",\"description\":\"\"}",
+                "{\"projectIdentifier\":\"TEST4\",\"projectName\":\"}",
+                "{\"projectIdentifier\":\"\",\"projectName\":\"TEST\",\"description\":\"Test description\"}",
+                "{\"projectName\":\"TEST\",\"description\":\"Test description\"}",
+                "{\"projectIdentifier\":\"TES\",\"projectName\":\"TEST\",\"description\":\"Test description\"}",
+                "{\"projectIdentifier\":\"TEST1020200\",\"projectName\":\"TEST\",\"description\":\"Test description\"}",
+                "{\"projectIdentifier\":\"TEST\",\"projectName\":\"TEST\",\"description\":\"Test description\"}"
+
+
+        );
+    }
+
+    protected String getJWTokenFromResponseContent(ResultActions actions) throws Exception {
+        return actions
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString()
+                .replace("{\"success\":true,\"token\":\"", "")
+                .replace("\"}", "");
+    }
+
+    protected String getProjectIdentifierFromResponseContent(ResultActions actions) throws Exception {
+        return actions
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString()
+                .substring(50, 55);
     }
 }
