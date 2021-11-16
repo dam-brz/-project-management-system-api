@@ -54,7 +54,7 @@ public class BacklogController {
                                             Principal principal) {
 
         ProjectTask task = projectTaskService.findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, principal.getName());
-        return new ResponseEntity<>(task, HttpStatus.CREATED);
+        return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
     @PutMapping("/{projectIdentifier}/{projectTaskSequence}")
