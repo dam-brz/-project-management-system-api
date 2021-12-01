@@ -2,6 +2,7 @@ package com.dambrz.projectmanagementsystemapi.service;
 
 import com.dambrz.projectmanagementsystemapi.model.User;
 import com.dambrz.projectmanagementsystemapi.repository.UserRepository;
+import com.dambrz.projectmanagementsystemapi.security.UserDetailsImplementation;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         User user = userRepository.findByUsername(username);
         if (user == null) throw new UsernameNotFoundException("User not found");
-        return user;
+        return UserDetailsImplementation.build(user);
     }
 
     @Transactional

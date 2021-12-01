@@ -1,8 +1,8 @@
-package com.dambrz.projectmanagementsystemapi.exceptions;
+package com.dambrz.projectmanagementsystemapi.exceptions.response;
 
 public class InvalidLoginResponse {
 
-    private  String credentials;
+    private final String credentials;
 
     public InvalidLoginResponse() {
         this.credentials = "Invalid credentials";

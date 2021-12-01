@@ -11,6 +11,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @EntityGraph(
             type = EntityGraph.EntityGraphType.FETCH,
             attributePaths = {
+                    "roles",
                     "projects",
                     "projects.backlog"
             }
@@ -18,4 +19,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     User findByUsername(String username);
 
     User getById(Long id);
+
+    Boolean existsByUsername(String username);
 }

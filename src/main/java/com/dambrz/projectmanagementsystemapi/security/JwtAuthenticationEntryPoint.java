@@ -1,6 +1,6 @@
 package com.dambrz.projectmanagementsystemapi.security;
 
-import com.dambrz.projectmanagementsystemapi.exceptions.InvalidLoginResponse;
+import com.dambrz.projectmanagementsystemapi.exceptions.response.InvalidLoginResponse;
 import com.google.gson.Gson;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

@@ -1,4 +1,4 @@
-package com.dambrz.projectmanagementsystemapi.exceptions;
+package com.dambrz.projectmanagementsystemapi.exceptions.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

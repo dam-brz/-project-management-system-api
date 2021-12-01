@@ -4,6 +4,7 @@ import com.dambrz.projectmanagementsystemapi.model.User;
 import com.dambrz.projectmanagementsystemapi.service.CustomUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -34,10 +35,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(httpServletRequest);
             if (StringUtils.hasText(jwt) && jwtProvider.isTokenValid(jwt)) {
-                Long userId = jwtProvider.getUserIdFromToken(jwt);
-                User userDetails = userDetailsService.loadUserById(userId);
+//                Long userId = jwtProvider.getUserIdFromToken(jwt);
+//                User userDetails = userDetailsService.loadUserById(userId);
+                String username = jwtProvider.getUsernameFromToken(jwt);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
