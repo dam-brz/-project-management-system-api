@@ -1,4 +1,4 @@
-package com.dambrz.projectmanagementsystemapi.payload;
+package com.dambrz.projectmanagementsystemapi.payload.request;
 
 import javax.validation.constraints.NotBlank;
 
@@ -8,7 +8,7 @@ public class LoginRequest {
     private String username;
 
     @NotBlank(message = "Cannot be blank")
-    private String password;
+    private final String password;
 
     public String getUsername() {
         return username;
@@ -20,10 +20,6 @@ public class LoginRequest {
 
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public LoginRequest(String username, String password) {

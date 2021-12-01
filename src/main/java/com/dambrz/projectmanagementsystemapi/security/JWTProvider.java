@@ -1,6 +1,5 @@
 package com.dambrz.projectmanagementsystemapi.security;
 
-import com.dambrz.projectmanagementsystemapi.model.User;
 import io.jsonwebtoken.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,7 @@ public class JWTProvider {
 
     public String generateToken(Authentication authentication) {
 
-        User user = (User) authentication.getPrincipal();
+        UserDetailsImplementation user = (UserDetailsImplementation) authentication.getPrincipal();
         Date now = new Date((System.currentTimeMillis()));
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
         String userId = Long.toString(user.getId());
@@ -25,7 +24,6 @@ public class JWTProvider {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", userId);
         claims.put("username", user.getUsername());
-        claims.put("fullName", user.getFullName());
 
         return Jwts.builder()
                 .setSubject(userId)
@@ -47,7 +45,7 @@ public class JWTProvider {
         } catch (ExpiredJwtException ex) {
             System.out.println("EXPIRED Invalid JWT Signature");
         } catch (UnsupportedJwtException ex) {
-            System.out.println("UNSUPPORDED Invalid JWT Signature");
+            System.out.println("UNSUPPORTED Invalid JWT Signature");
         }
         return false;
     }
@@ -57,5 +55,13 @@ public class JWTProvider {
         String id = (String) claims.get("id");
 
         return Long.parseLong(id);
+    }
+
+    public String getUsernameFromToken(String token) {
+        return (String) Jwts.parser()
+                .setSigningKey(SECRET)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("username");
     }
 }

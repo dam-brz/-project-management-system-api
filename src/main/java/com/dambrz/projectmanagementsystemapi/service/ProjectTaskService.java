@@ -1,6 +1,6 @@
 package com.dambrz.projectmanagementsystemapi.service;
 
-import com.dambrz.projectmanagementsystemapi.exceptions.ProjectNotFoundException;
+import com.dambrz.projectmanagementsystemapi.exceptions.exception.ProjectNotFoundException;
 import com.dambrz.projectmanagementsystemapi.model.Backlog;
 import com.dambrz.projectmanagementsystemapi.model.ProjectTask;
 import com.dambrz.projectmanagementsystemapi.repository.ProjectTaskRepository;

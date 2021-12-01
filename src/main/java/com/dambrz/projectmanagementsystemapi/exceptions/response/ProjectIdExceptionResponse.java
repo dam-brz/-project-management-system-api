@@ -1,10 +1,10 @@
-package com.dambrz.projectmanagementsystemapi.exceptions;
+package com.dambrz.projectmanagementsystemapi.exceptions.response;
 
-public class ProjectNotFoundExceptionResponse {
+public class ProjectIdExceptionResponse {
 
     private String projectIdentifier;
 
-    public ProjectNotFoundExceptionResponse(String projectIdentifier) {
+    public ProjectIdExceptionResponse(String projectIdentifier) {
         this.projectIdentifier = projectIdentifier;
     }
 

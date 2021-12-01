@@ -1,59 +1,43 @@
 package com.dambrz.projectmanagementsystemapi.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Proxy;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Proxy(lazy=false)
-public class User implements UserDetails {
+public class User  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Email(message = "Username needs to be an email")
-    @NotBlank(message = "Username is required")
-    @Column(unique = true)
     private String username;
-
-    @NotBlank(message = "Please enter full name")
     private String fullName;
-
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Use min 6 characters")
     private String password;
+    private String projectLeader;
+    private Date createAt;
+    private Date updatedAt;
 
-    @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String confirmPassword;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(	name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "user", orphanRemoval = true)
     private Set<Project> projects = new HashSet<>();
 
-    private String projectLeader;
-
-    private Date createAt;
-    private Date updatedAt;
-
     public User() {
     }
 
-    public User(String username, String fullName, String password, String confirmPassword) {
+    public User(String username, String fullName, String password) {
         this.username = username;
         this.fullName = fullName;
         this.password = password;
-        this.confirmPassword = confirmPassword;
     }
 
     public Long getId() {
@@ -88,12 +72,12 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     public Set<Project> getProjects() {
@@ -128,30 +112,5 @@ public class User implements UserDetails {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = new Date();
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }
