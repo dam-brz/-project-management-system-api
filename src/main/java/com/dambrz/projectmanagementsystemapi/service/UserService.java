@@ -11,8 +11,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+import static com.dambrz.projectmanagementsystemapi.exceptions.ExceptionMessageContent.USERNAME_ALREADY_EXISTS_MSG;
+
 @Service
 public class UserService {
+
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -26,12 +29,16 @@ public class UserService {
 
     public User saveUser (RegistrationRequest registrationRequest) {
         if (isUsernameExists(registrationRequest.getUsername())) {
-            throw new UsernameAlreadyExistsError("Username '" + registrationRequest.getUsername() + "' already exists.");
+            throw new UsernameAlreadyExistsError(USERNAME_ALREADY_EXISTS_MSG);
         } else {
             User user = getUserFromRegistrationRequest(registrationRequest);
             user.setRoles(Collections.singleton(roleRepository.findByName(ERole.ROLE_DEVELOPER)));
             return userRepository.save(user);
         }
+    }
+
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     private boolean isUsernameExists(String username) {

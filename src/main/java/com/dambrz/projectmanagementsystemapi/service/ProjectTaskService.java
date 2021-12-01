@@ -22,7 +22,8 @@ public class ProjectTaskService {
     public ProjectTask addProjectTask(String projectIdentifier, ProjectTask projectTask, String username) {
 
         try {
-            Backlog backlog = projectService.findProjectByProjectIdentifier(projectIdentifier, username).getBacklog();
+//            Backlog backlog = projectService.findProjectByProjectIdentifier(projectIdentifier, username).getBacklog();
+            Backlog backlog = new Backlog();
             projectTask.setBacklog(backlog);
 
             int backlogSequence = backlog.getPTSequence();

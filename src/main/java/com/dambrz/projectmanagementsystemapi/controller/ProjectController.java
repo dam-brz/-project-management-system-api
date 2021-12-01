@@ -1,8 +1,10 @@
 package com.dambrz.projectmanagementsystemapi.controller;
 
-import com.dambrz.projectmanagementsystemapi.model.Project;
+import com.dambrz.projectmanagementsystemapi.exceptions.exception.RequestValidationException;
+import com.dambrz.projectmanagementsystemapi.payload.dto.ProjectDto;
+import com.dambrz.projectmanagementsystemapi.payload.request.CreateProjectRequest;
+import com.dambrz.projectmanagementsystemapi.payload.response.DeleteOperationResponse;
 import com.dambrz.projectmanagementsystemapi.service.ProjectService;
-import com.dambrz.projectmanagementsystemapi.service.ValidationErrorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,55 +19,39 @@ import java.security.Principal;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final ValidationErrorService validationErrorService;
 
-    public ProjectController(ProjectService projectService, ValidationErrorService validationErrorService) {
+    public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
-        this.validationErrorService = validationErrorService;
     }
 
     @PostMapping
-    public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result, Principal principal) {
-        ResponseEntity<?> errorMap = validationErrorService.validate(result);
-        if (errorMap != null) {
-            return errorMap;
-        }
-
-        return new ResponseEntity<>(
-                projectService.save(project, principal.getName()),
-                HttpStatus.CREATED);
+    public void createNewProject(@Valid @RequestBody CreateProjectRequest project, BindingResult result, Principal principal) {
+        if (result.hasErrors()) throw new RequestValidationException(result);
+        projectService.save(project, principal.getName());
     }
 
     @GetMapping("/{projectIdentifier}")
     public ResponseEntity<?> getProjectByProjectIdentifier(@PathVariable String projectIdentifier, Principal principal) {
-
-        return new ResponseEntity<Project>(
-                projectService.findProjectByProjectIdentifier(projectIdentifier, principal.getName()),
-                HttpStatus.OK);
+        return new ResponseEntity<>(
+                projectService.findProjectByProjectIdentifier(projectIdentifier, principal.getName()), HttpStatus.OK);
     }
 
     @GetMapping
-    public Iterable<Project> getAllProjects(Principal principal) {
-        return projectService.findAllProjects(principal.getName());
+    public ResponseEntity<?> getAllProjects(Principal principal) {
+        return new ResponseEntity<>(projectService.findAllProjectsDto(principal), HttpStatus.OK);
     }
 
     @DeleteMapping("/{projectIdentifier}")
     public ResponseEntity<?> deleteProject(@PathVariable String projectIdentifier, Principal principal) {
-        projectService.deleteProjectByIdentifier(projectIdentifier, principal.getName());
-
-        return new ResponseEntity<String>("Project with ID: " + projectIdentifier + " was deleted", HttpStatus.OK);
+        if (projectService.deleteProjectByIdentifier(projectIdentifier, principal.getName()))
+            return new ResponseEntity<>(new DeleteOperationResponse(true), HttpStatus.OK);
+        else return new ResponseEntity<>(new DeleteOperationResponse(false), HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/{projectIdentifier}")
-    public ResponseEntity<?> updateProject(@PathVariable String projectIdentifier, @Valid @RequestBody Project project, BindingResult result, Principal principal) {
-        ResponseEntity<?> errorMap = validationErrorService.validate(result);
-        if (errorMap != null) {
-            return errorMap;
-        }
-
-        return new ResponseEntity<>(
-                projectService.updateProject(projectIdentifier, project, principal.getName()),
-                HttpStatus.OK);
+    public void updateProject(@PathVariable String projectIdentifier, @Valid @RequestBody ProjectDto projectDto, BindingResult result, Principal principal) {
+        if (result.hasErrors()) throw new RequestValidationException(result);
+        projectService.updateProject(projectIdentifier, projectDto, principal.getName());
     }
 
 }
