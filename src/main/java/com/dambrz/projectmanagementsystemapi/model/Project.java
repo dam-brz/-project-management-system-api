@@ -1,11 +1,7 @@
 package com.dambrz.projectmanagementsystemapi.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
@@ -15,38 +11,22 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Project name is required")
     private String projectName;
 
-    @NotBlank(message = "Project identifier is required")
-    @Size(min = 4, max = 10, message = "Use 4 to 10 characters")
     @Column(unique = true, updatable = false)
     private String projectIdentifier;
-
-    @NotBlank(message = "Project description is required")
     private String description;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
     private Date startDate;
-
-    @JsonFormat(pattern="yyyy-MM-dd")
     private Date endDate;
-
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date createAt;
-
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "project")
-    @JsonIgnore
     private Backlog backlog;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
-    private User user;
-
-    private String projectLeader;
+    private User projectLeader;
 
     public Project() {
     }
@@ -57,11 +37,14 @@ public class Project {
         this.description = description;
     }
 
-    public Project(String projectName, String projectIdentifier, String description, String projectLeader) {
+    public Project(Long id, String projectName, String description, Date startDate, Date endDate, Date createAt, Date updatedAt) {
+        this.id = id;
         this.projectName = projectName;
-        this.projectIdentifier = projectIdentifier;
         this.description = description;
-        this.projectLeader = projectLeader;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.createAt = createAt;
+        this.updatedAt = updatedAt;
     }
 
     public Long getId() {
@@ -136,25 +119,18 @@ public class Project {
         this.backlog = backlog;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getProjectLeader() {
+    public User getProjectLeader() {
         return projectLeader;
     }
 
-    public void setProjectLeader(String projectLeader) {
+    public void setProjectLeader(User projectLeader) {
         this.projectLeader = projectLeader;
     }
 
     @PrePersist
     protected void onCreate() {
         this.createAt = new Date();
+        this.updatedAt = new Date();
     }
 
     @PreUpdate

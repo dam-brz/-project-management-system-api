@@ -13,4 +13,16 @@ public class JWTLoginSuccessResponse {
         this.token = token;
         this.roles = roles;
     }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
 }

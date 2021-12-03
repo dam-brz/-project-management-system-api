@@ -43,10 +43,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest registrationRequest , BindingResult result) {
-
         passwordValidator.validate(registrationRequest, result);
         if (result.hasErrors()) throw new RequestValidationException(result);
-        return new ResponseEntity<>(userService.saveUser(registrationRequest), HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.save(registrationRequest), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

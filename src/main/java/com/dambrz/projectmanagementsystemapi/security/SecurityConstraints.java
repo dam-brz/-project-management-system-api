@@ -22,5 +22,5 @@ public class SecurityConstraints {
     protected static final String SECRET = "SecreteKey";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
-    protected static final long EXPIRATION_TIME = 30_000; //TESTS
+    protected static final long EXPIRATION_TIME = 30_00000; //TESTS
 }

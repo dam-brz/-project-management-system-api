@@ -18,7 +18,6 @@ public class User  {
     private String username;
     private String fullName;
     private String password;
-    private String projectLeader;
     private Date createAt;
     private Date updatedAt;
 
@@ -28,7 +27,7 @@ public class User  {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "user", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "projectLeader", orphanRemoval = true)
     private Set<Project> projects = new HashSet<>();
 
     public User() {

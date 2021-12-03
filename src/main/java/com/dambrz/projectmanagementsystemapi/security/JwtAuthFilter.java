@@ -1,6 +1,5 @@
 package com.dambrz.projectmanagementsystemapi.security;
 
-import com.dambrz.projectmanagementsystemapi.model.User;
 import com.dambrz.projectmanagementsystemapi.service.CustomUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,8 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
 
+import static com.dambrz.projectmanagementsystemapi.exceptions.ExceptionMessageContent.COULD_NOT_SET_USER_AUTHENTICATION_IN_SECURITY_CONTEXT;
 import static com.dambrz.projectmanagementsystemapi.security.SecurityConstraints.HEADER_STRING;
 import static com.dambrz.projectmanagementsystemapi.security.SecurityConstraints.TOKEN_PREFIX;
 
@@ -35,8 +34,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(httpServletRequest);
             if (StringUtils.hasText(jwt) && jwtProvider.isTokenValid(jwt)) {
-//                Long userId = jwtProvider.getUserIdFromToken(jwt);
-//                User userDetails = userDetailsService.loadUserById(userId);
                 String username = jwtProvider.getUsernameFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -45,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception exc) {
-            logger.error("Could not set user authentication in security context", exc);
+            logger.error(COULD_NOT_SET_USER_AUTHENTICATION_IN_SECURITY_CONTEXT, exc);
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
@@ -55,7 +52,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader(HEADER_STRING);
 
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(TOKEN_PREFIX)) {
-            return bearerToken.substring(7, bearerToken.length());
+            return bearerToken.substring(7);
         }
 
         return null;
