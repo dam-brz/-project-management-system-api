@@ -31,8 +31,8 @@ public class ProjectTaskService {
         this.projectTaskMapper = projectTaskMapper;
     }
 
-    public void addProjectTask(String projectIdentifier, CreateProjectTaskRequest createProjectTaskRequest, String username) {
-            Project project = projectService.getProjectByProjectIdentifier(projectIdentifier);
+    public void save(String projectIdentifier, CreateProjectTaskRequest createProjectTaskRequest, String username) {
+            Project project = projectService.findProjectByProjectIdentifier(projectIdentifier);
 
             if (!project.getProjectLeader().getUsername().equals(username))
                 throw new ProjectNotFoundException(PROJECT_NOT_FOUND_IN_YOUR_ACCOUNT_MSG);
@@ -55,7 +55,7 @@ public class ProjectTaskService {
             projectTaskRepository.save(projectTask);
     }
 
-    public Set<ProjectTaskDto> findBacklogByProjectIdentifier(String projectIdentifier, String username) {
+    public Set<ProjectTaskDto> findProjectBacklog(String projectIdentifier, String username) {
         projectService.findProjectByProjectIdentifier(projectIdentifier, username);
         return projectTaskMapper
                 .getAllProjectTasksDto(
@@ -73,7 +73,7 @@ public class ProjectTaskService {
         return task;
     }
 
-    public void updateProjectTask(ProjectTaskDto updatedProjectTask, String projectIdentifier, String projectTaskSequence, String username) {
+    public void update(ProjectTaskDto updatedProjectTask, String projectIdentifier, String projectTaskSequence, String username) {
         ProjectTask task =
                 projectTaskMapper
                         .getProjectTask(
@@ -87,7 +87,7 @@ public class ProjectTaskService {
         projectTaskRepository.save(task);
     }
 
-    public boolean deleteProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence, String username) {
+    public boolean delete(String projectIdentifier, String projectTaskSequence, String username) {
         boolean success = false;
         Optional<ProjectTask> task = projectTaskRepository.findProjectTaskByProjectSequence(projectTaskSequence);
 

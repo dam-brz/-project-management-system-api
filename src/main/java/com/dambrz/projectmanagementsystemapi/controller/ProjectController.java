@@ -43,7 +43,7 @@ public class ProjectController {
 
     @DeleteMapping("/{projectIdentifier}")
     public ResponseEntity<?> deleteProject(@PathVariable String projectIdentifier, Principal principal) {
-        if (projectService.deleteProjectByIdentifier(projectIdentifier, principal.getName()))
+        if (projectService.delete(projectIdentifier, principal.getName()))
             return new ResponseEntity<>(new DeleteOperationResponse(true), HttpStatus.OK);
         else return new ResponseEntity<>(new DeleteOperationResponse(false), HttpStatus.BAD_REQUEST);
     }
@@ -51,7 +51,7 @@ public class ProjectController {
     @PutMapping("/{projectIdentifier}")
     public void updateProject(@PathVariable String projectIdentifier, @Valid @RequestBody ProjectDto projectDto, BindingResult result, Principal principal) {
         if (result.hasErrors()) throw new RequestValidationException(result);
-        projectService.updateProject(projectIdentifier, projectDto, principal.getName());
+        projectService.update(projectIdentifier, projectDto, principal.getName());
     }
 
 }

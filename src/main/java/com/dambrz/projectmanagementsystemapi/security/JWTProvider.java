@@ -7,12 +7,17 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import static com.dambrz.projectmanagementsystemapi.exceptions.ExceptionMessageContent.*;
 import static com.dambrz.projectmanagementsystemapi.security.SecurityConstraints.EXPIRATION_TIME;
 import static com.dambrz.projectmanagementsystemapi.security.SecurityConstraints.SECRET;
 
 @Component
 public class JWTProvider {
+
+    static Logger logger = Logger.getLogger(JWTProvider.class.getName());
 
     public String generateToken(Authentication authentication) {
 
@@ -39,22 +44,15 @@ public class JWTProvider {
             Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
             return true;
         } catch (SignatureException ex) {
-            System.out.println("SIGNATURE Invalid JWT Signature");
+            logger.log(Level.WARNING, SIGNATURE_INVALID_JWT_SIGNATURE);
         } catch (MalformedJwtException ex) {
-            System.out.println("MALFORMED Invalid JWT Signature");
+            logger.log(Level.WARNING, MALFORMED_INVALID_JWT_SIGNATURE);
         } catch (ExpiredJwtException ex) {
-            System.out.println("EXPIRED Invalid JWT Signature");
+            logger.log(Level.WARNING, EXPIRED_INVALID_JWT_SIGNATURE);
         } catch (UnsupportedJwtException ex) {
-            System.out.println("UNSUPPORTED Invalid JWT Signature");
+            logger.log(Level.WARNING, UNSUPPORTED_INVALID_JWT_SIGNATURE);
         }
         return false;
-    }
-
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
-        String id = (String) claims.get("id");
-
-        return Long.parseLong(id);
     }
 
     public String getUsernameFromToken(String token) {

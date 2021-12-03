@@ -1,12 +1,10 @@
 package com.dambrz.projectmanagementsystemapi.controller;
 
 import com.dambrz.projectmanagementsystemapi.exceptions.exception.RequestValidationException;
-import com.dambrz.projectmanagementsystemapi.model.ProjectTask;
 import com.dambrz.projectmanagementsystemapi.payload.dto.ProjectTaskDto;
 import com.dambrz.projectmanagementsystemapi.payload.request.CreateProjectTaskRequest;
 import com.dambrz.projectmanagementsystemapi.payload.response.DeleteOperationResponse;
 import com.dambrz.projectmanagementsystemapi.service.ProjectTaskService;
-import com.dambrz.projectmanagementsystemapi.service.ValidationErrorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/backlogs")
@@ -23,11 +20,8 @@ public class BacklogController {
 
     private final ProjectTaskService projectTaskService;
 
-    private final ValidationErrorService validationErrorService;
-
-    public BacklogController(ProjectTaskService projectTaskService, ValidationErrorService validationErrorService) {
+    public BacklogController(ProjectTaskService projectTaskService) {
         this.projectTaskService = projectTaskService;
-        this.validationErrorService = validationErrorService;
     }
 
     @PostMapping("/{projectIdentifier}")
@@ -36,12 +30,12 @@ public class BacklogController {
                                                      @PathVariable String projectIdentifier,
                                                      Principal principal) {
         if (result.hasErrors()) throw new RequestValidationException(result);
-        projectTaskService.addProjectTask(projectIdentifier, projectTask, principal.getName());
+        projectTaskService.save(projectIdentifier, projectTask, principal.getName());
     }
 
     @GetMapping("/{projectIdentifier}")
     public ResponseEntity<?> getProjectBacklog(@PathVariable String projectIdentifier, Principal principal) {
-        return new ResponseEntity<>(projectTaskService.findBacklogByProjectIdentifier(projectIdentifier, principal.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(projectTaskService.findProjectBacklog(projectIdentifier, principal.getName()), HttpStatus.OK);
     }
 
     @GetMapping("/{projectIdentifier}/{projectTaskSequence}")
@@ -59,7 +53,7 @@ public class BacklogController {
                                                Principal principal) {
         if (result.hasErrors()) throw new RequestValidationException(result);
         projectTaskService
-                .updateProjectTask(
+                .update(
                         updatedProjectTask, projectIdentifier, projectTaskSequence, principal.getName());
     }
 
@@ -68,7 +62,7 @@ public class BacklogController {
                                                @PathVariable String projectTaskSequence,
                                                Principal principal) {
 
-        if (projectTaskService.deleteProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, principal.getName()))
+        if (projectTaskService.delete(projectIdentifier, projectTaskSequence, principal.getName()))
             return new ResponseEntity<>(new DeleteOperationResponse(true), HttpStatus.OK);
         else return new ResponseEntity<>(new DeleteOperationResponse(false), HttpStatus.BAD_REQUEST);
     }

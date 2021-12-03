@@ -14,13 +14,16 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+    public static final String APPLICATION_JSON = "application/json";
+    public static final int UNAUTHORIZED = 401;
+
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
         InvalidLoginResponse loginResponse = new InvalidLoginResponse();
         String jsonLoginResponse = new Gson().toJson(loginResponse);
 
-        httpServletResponse.setContentType("application/json");
-        httpServletResponse.setStatus(401);
+        httpServletResponse.setContentType(APPLICATION_JSON);
+        httpServletResponse.setStatus(UNAUTHORIZED);
         httpServletResponse.getWriter().print(jsonLoginResponse);
     }
 }

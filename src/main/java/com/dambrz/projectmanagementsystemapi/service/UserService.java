@@ -27,7 +27,7 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-    public User saveUser (RegistrationRequest registrationRequest) {
+    public User save(RegistrationRequest registrationRequest) {
         if (isUsernameExists(registrationRequest.getUsername())) {
             throw new UsernameAlreadyExistsError(USERNAME_ALREADY_EXISTS_MSG);
         } else {

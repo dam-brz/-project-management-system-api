@@ -32,19 +32,17 @@ public class ProjectService {
     public void save(CreateProjectRequest createProjectRequest, String username) {
         if (isProjectIdentifierExists(createProjectRequest.getProjectIdentifier()))
             throw new ProjectIdException(PROJECT_IDENTIFIER_ALREADY_EXISTS_MSG);
-        else projectRepository.save(getProject(createProjectRequest, username));
+        else projectRepository.save(createProject(createProjectRequest, username));
     }
 
     public ProjectDto findProjectByProjectIdentifier(String projectIdentifier, String username) {
-        ProjectDto project = projectMapper.getProjectDto(getProjectByProjectIdentifier(projectIdentifier));
-
+        ProjectDto project = projectMapper.getProjectDto(findProjectByProjectIdentifier(projectIdentifier));
         if (!project.getProjectLeader().equals(username))
             throw new ProjectNotFoundException(PROJECT_NOT_FOUND_IN_YOUR_ACCOUNT_MSG);
-
         return project;
     }
 
-    public Project getProjectByProjectIdentifier(String projectIdentifier) {
+    public Project findProjectByProjectIdentifier(String projectIdentifier) {
         return projectRepository
                 .findByProjectIdentifier(projectIdentifier.toUpperCase())
                 .orElseThrow(() -> new ProjectNotFoundException(PROJECT_DOESNT_EXISTS_MSG));
@@ -56,8 +54,8 @@ public class ProjectService {
                         getAllUserProjects(userService.findUserByUsername(principal.getName())));
     }
 
-    public boolean deleteProjectByIdentifier(String projectIdentifier, String username) {
-        Project project = getProjectByProjectIdentifier(projectIdentifier);
+    public boolean delete(String projectIdentifier, String username) {
+        Project project = findProjectByProjectIdentifier(projectIdentifier);
         boolean success = false;
 
         if (project.getProjectLeader().getUsername().equals(username)) {
@@ -68,8 +66,8 @@ public class ProjectService {
         return success;
     }
 
-    public void updateProject(String projectIdentifier, ProjectDto updatedProject, String username) {
-        Project projectToUpdate = getProjectByProjectIdentifier(projectIdentifier);
+    public void update(String projectIdentifier, ProjectDto updatedProject, String username) {
+        Project projectToUpdate = findProjectByProjectIdentifier(projectIdentifier);
 
         if (!projectToUpdate.getProjectLeader().getUsername().equals(username))
             throw new ProjectNotFoundException(PROJECT_NOT_FOUND_IN_YOUR_ACCOUNT_MSG);
@@ -81,7 +79,7 @@ public class ProjectService {
         projectRepository.save(projectToUpdate);
     }
 
-    private Project getProject(CreateProjectRequest createProjectRequest, String username) {
+    private Project createProject(CreateProjectRequest createProjectRequest, String username) {
         Backlog backlog = new Backlog();
         Project project = projectMapper.getProjectFromCreateProjectRequest(createProjectRequest);
         project.setProjectLeader(userService.findUserByUsername(username));
