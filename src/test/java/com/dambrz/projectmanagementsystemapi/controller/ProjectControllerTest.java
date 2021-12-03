@@ -3,6 +3,7 @@ package com.dambrz.projectmanagementsystemapi.controller;
 import com.dambrz.projectmanagementsystemapi.TestHelper;
 import com.dambrz.projectmanagementsystemapi.model.Project;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -21,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ProjectControllerTest extends TestHelper {
 
     @Autowired
@@ -31,6 +30,7 @@ class ProjectControllerTest extends TestHelper {
 
     @BeforeEach
     void setUp() throws Exception {
+        projectRepository.deleteAll();
         mockMvc.perform(post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getValidUserAsJsonString()));
@@ -41,13 +41,13 @@ class ProjectControllerTest extends TestHelper {
         ResultActions loginResult = performLogin(getValidLoginRequestAsJsonString());
         String token = getJWTokenFromResponseContent(loginResult);
         String project = getValidProjectAsJsonString();
-        performCreateNewProject(token, project).andExpect(status().isCreated());
+        performCreateNewProject(token, project).andExpect(status().isOk());
     }
 
     @ParameterizedTest
     @MethodSource("getInvalidProjectsAsJson")
     void testSaveShouldReturnBadRequestStatus(String arg) throws Exception {
-        projectRepository.save(createValidSampleProject());
+        projectRepository.save(createSampleProject());
         ResultActions loginResult = performLogin(getValidLoginRequestAsJsonString());
         String token = getJWTokenFromResponseContent(loginResult);
         performCreateNewProject(token, arg).andExpect(status().isBadRequest());
@@ -57,10 +57,9 @@ class ProjectControllerTest extends TestHelper {
     void testGetProjectByProjectIdentifier() throws Exception {
         ResultActions loginResult = performLogin(getValidLoginRequestAsJsonString());
         String token = getJWTokenFromResponseContent(loginResult);
-        ResultActions createNewProjectResult = performCreateNewProject(token, getValidProjectAsJsonString());
-        String projectIdentifier = getProjectIdentifierFromResponseContent(createNewProjectResult);
+        performCreateNewProject(token, getValidProjectAsJsonString());
 
-        mockMvc.perform(get("/api/projects/" + projectIdentifier).header(HEADER_STRING, token))
+        mockMvc.perform(get("/api/projects/TEST1").header(HEADER_STRING, token))
                 .andExpect(status().isOk());
 
     }
@@ -69,10 +68,9 @@ class ProjectControllerTest extends TestHelper {
     void testGetProjectByProjectIdentifierShouldThrow() throws Exception {
         ResultActions loginResult = performLogin(getValidLoginRequestAsJsonString());
         String token = getJWTokenFromResponseContent(loginResult);
-        ResultActions createNewProjectResult = performCreateNewProject(token, getValidProjectAsJsonString());
-        String projectIdentifier = getProjectIdentifierFromResponseContent(createNewProjectResult);
+        performCreateNewProject(token, getValidProjectAsJsonString());
 
-        mockMvc.perform(get("/api/projects/" + projectIdentifier.concat("1")).header(HEADER_STRING, token))
+        mockMvc.perform(get("/api/projects/TEST12").header(HEADER_STRING, token))
                 .andExpect(status().isBadRequest());
     }
 
@@ -87,17 +85,38 @@ class ProjectControllerTest extends TestHelper {
     void deleteProject() throws Exception {
         ResultActions loginResult = performLogin(getValidLoginRequestAsJsonString());
         String token = getJWTokenFromResponseContent(loginResult);
-        ResultActions createNewProjectResult = performCreateNewProject(token, getValidProjectAsJsonString());
-        String projectIdentifier = getProjectIdentifierFromResponseContent(createNewProjectResult);
-        mockMvc.perform(delete("/api/projects/" + projectIdentifier).header(HEADER_STRING, token)).andExpect(status().isOk());
+        performCreateNewProject(token, getValidProjectAsJsonString());
+
+        String content = mockMvc.perform(delete("/api/projects/TEST1").header(HEADER_STRING, token))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Assertions.assertThat(content).isEqualTo(getDeleteResponseAsJsonString(true));
+    }
+
+    @Test
+    void deleteProjectShouldThrowBadRequest() throws Exception {
+        ResultActions loginResult = performLogin(getValidLoginRequestAsJsonString());
+        String token = getJWTokenFromResponseContent(loginResult);
+        performCreateNewProject(token, getValidProjectAsJsonString());
+
+        String content = mockMvc.perform(delete("/api/projects/TEST12").header(HEADER_STRING, token))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Assertions.assertThat(content).isEqualTo(getDeleteResponseAsJsonString(false));
     }
 
     @Test
     void updateProject() throws Exception {
         ResultActions loginResult = performLogin(getValidLoginRequestAsJsonString());
         String token = getJWTokenFromResponseContent(loginResult);
-        ResultActions createNewProjectResult = performCreateNewProject(token, getValidProjectAsJsonString());
-        Project project = objectMapper.readValue(createNewProjectResult.andReturn().getResponse().getContentAsString(), Project.class);
+        performCreateNewProject(token, getValidProjectAsJsonString());
+        Project project = objectMapper.readValue(getValidProjectAsJsonString(), Project.class);
         project.setDescription("AaAaa");
         String updatedProjectAsJsonString = objectMapper.writeValueAsString(project);
 
@@ -107,14 +126,16 @@ class ProjectControllerTest extends TestHelper {
                         .header(HEADER_STRING, token)
                         .content(updatedProjectAsJsonString)).andExpect(status().isOk());
 
+        Assertions.assertThat(getValidProjectAsJsonString()).isNotEqualTo(updatedProjectAsJsonString);
+
     }
 
     @Test
     void testUpdateProjectShouldThrowBadRequest() throws Exception {
         ResultActions loginResult = performLogin(getValidLoginRequestAsJsonString());
         String token = getJWTokenFromResponseContent(loginResult);
-        ResultActions createNewProjectResult = performCreateNewProject(token, getValidProjectAsJsonString());
-        Project project = objectMapper.readValue(createNewProjectResult.andReturn().getResponse().getContentAsString(), Project.class);
+        performCreateNewProject(token, getValidProjectAsJsonString());
+        Project project = objectMapper.readValue(getValidProjectAsJsonString(), Project.class);
         project.setDescription(null);
         String updatedProjectAsJsonString = objectMapper.writeValueAsString(project);
 
