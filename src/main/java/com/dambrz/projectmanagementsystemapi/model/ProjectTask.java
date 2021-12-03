@@ -17,13 +17,10 @@ public class ProjectTask {
     @Column(updatable = false, unique = true)
     private String projectSequence;
 
-    @NotBlank(message = "Please include a project summary")
     private String summary;
     private String acceptanceCriteria;
     private String status;
     private Integer priority;
-
-    @JsonFormat(pattern="yyyy-MM-dd")
     private Date dueDate;
 
     private Date createAt;
@@ -40,6 +37,14 @@ public class ProjectTask {
     public ProjectTask() {
     }
 
+    public ProjectTask(String summary, String acceptanceCriteria, String status, Integer priority, Date dueDate) {
+        this.summary = summary;
+        this.acceptanceCriteria = acceptanceCriteria;
+        this.status = status;
+        this.priority = priority;
+        this.dueDate = dueDate;
+    }
+
     public ProjectTask(String projectSequence, String summary, Integer priority, String projectIdentifier) {
         this.projectSequence = projectSequence;
         this.summary = summary;
@@ -53,6 +58,16 @@ public class ProjectTask {
         this.priority = priority;
         this.projectIdentifier = projectIdentifier;
         this.backlog = backlog;
+    }
+
+    public ProjectTask(Long id, String projectSequence, String summary, String acceptanceCriteria, String status, Integer priority, Date dueDate, String projectIdentifier) {
+        this.id = id;
+        this.projectSequence = projectSequence;
+        this.summary = summary;
+        this.acceptanceCriteria = acceptanceCriteria;
+        this.status = status;
+        this.priority = priority;
+        this.projectIdentifier = projectIdentifier;
     }
 
     public Long getId() {
@@ -146,6 +161,7 @@ public class ProjectTask {
     @PrePersist
     protected void onCreate() {
         this.createAt = new Date();
+        this.updatedAt = new Date();
     }
 
     @PreUpdate

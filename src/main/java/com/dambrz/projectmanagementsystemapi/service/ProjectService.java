@@ -44,6 +44,12 @@ public class ProjectService {
         return project;
     }
 
+    public Project getProjectByProjectIdentifier(String projectIdentifier) {
+        return projectRepository
+                .findByProjectIdentifier(projectIdentifier.toUpperCase())
+                .orElseThrow(() -> new ProjectNotFoundException(PROJECT_DOESNT_EXISTS_MSG));
+    }
+
     public List<ProjectDto> findAllProjectsDto(Principal principal) {
         return projectMapper
                 .getAllUserProjectsDto(
@@ -90,12 +96,6 @@ public class ProjectService {
 
     private boolean isProjectIdentifierExists(String projectIdentifier) {
         return projectRepository.existsByProjectIdentifier(projectIdentifier.toUpperCase());
-    }
-
-    private Project getProjectByProjectIdentifier(String projectIdentifier) {
-        return projectRepository
-                .findByProjectIdentifier(projectIdentifier.toUpperCase())
-                .orElseThrow(() -> new ProjectNotFoundException(PROJECT_DOESNT_EXISTS_MSG));
     }
 
     private List<Project> getAllUserProjects(User user) {

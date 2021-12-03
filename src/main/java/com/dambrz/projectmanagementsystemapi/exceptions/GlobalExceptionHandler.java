@@ -42,4 +42,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         });
         return new RequestValidationExceptionResponse(errorMap, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    public final ResponseEntity<?> handleTaskNotFoundException(TaskNotFoundException taskNotFoundException, WebRequest request) {
+        return new UsernameAlreadyExistsResponse(taskNotFoundException.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

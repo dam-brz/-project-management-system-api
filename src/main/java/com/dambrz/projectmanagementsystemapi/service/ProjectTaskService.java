@@ -1,88 +1,120 @@
 package com.dambrz.projectmanagementsystemapi.service;
 
 import com.dambrz.projectmanagementsystemapi.exceptions.exception.ProjectNotFoundException;
+import com.dambrz.projectmanagementsystemapi.exceptions.exception.TaskNotFoundException;
+import com.dambrz.projectmanagementsystemapi.mapper.ProjectTaskMapper;
 import com.dambrz.projectmanagementsystemapi.model.Backlog;
+import com.dambrz.projectmanagementsystemapi.model.Project;
 import com.dambrz.projectmanagementsystemapi.model.ProjectTask;
+import com.dambrz.projectmanagementsystemapi.model.enums.EPriority;
+import com.dambrz.projectmanagementsystemapi.model.enums.EStatus;
+import com.dambrz.projectmanagementsystemapi.payload.dto.ProjectTaskDto;
+import com.dambrz.projectmanagementsystemapi.payload.request.CreateProjectTaskRequest;
 import com.dambrz.projectmanagementsystemapi.repository.ProjectTaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
+
+import static com.dambrz.projectmanagementsystemapi.exceptions.ExceptionMessageContent.*;
 
 @Service
 public class ProjectTaskService {
 
     private final ProjectTaskRepository projectTaskRepository;
     private final ProjectService projectService;
+    private final ProjectTaskMapper projectTaskMapper;
 
-    public ProjectTaskService(ProjectTaskRepository projectTaskRepository, ProjectService projectService) {
+    public ProjectTaskService(ProjectTaskRepository projectTaskRepository, ProjectService projectService, ProjectTaskMapper projectTaskMapper) {
         this.projectTaskRepository = projectTaskRepository;
         this.projectService = projectService;
+        this.projectTaskMapper = projectTaskMapper;
     }
 
-    public ProjectTask addProjectTask(String projectIdentifier, ProjectTask projectTask, String username) {
+    public void addProjectTask(String projectIdentifier, CreateProjectTaskRequest createProjectTaskRequest, String username) {
+            Project project = projectService.getProjectByProjectIdentifier(projectIdentifier);
 
-        try {
-//            Backlog backlog = projectService.findProjectByProjectIdentifier(projectIdentifier, username).getBacklog();
-            Backlog backlog = new Backlog();
+            if (!project.getProjectLeader().getUsername().equals(username))
+                throw new ProjectNotFoundException(PROJECT_NOT_FOUND_IN_YOUR_ACCOUNT_MSG);
+
+            ProjectTask projectTask = projectTaskMapper.getProjectTask(createProjectTaskRequest);
+            Backlog backlog = project.getBacklog();
+
+            int sequence = calculateProjectTaskSequence(backlog);
+            backlog.setPTSequence(sequence);
             projectTask.setBacklog(backlog);
-
-            int backlogSequence = backlog.getPTSequence();
-            backlogSequence++;
-            backlog.setPTSequence(backlogSequence);
-
-            projectTask.setProjectSequence(projectIdentifier + "-" + backlogSequence);
+            projectTask.setProjectSequence(projectIdentifier + "-" + sequence);
             projectTask.setProjectIdentifier(projectIdentifier);
 
-            if (projectTask.getPriority() == null || projectTask.getPriority() == 0) {
-                projectTask.setPriority(3);
-            }
+            if (projectTask.getPriority() == null || projectTask.getPriority() == EPriority.NOT_SELECTED.getPriorityCode())
+                projectTask.setPriority(EPriority.HIGH.getPriorityCode());
 
-            if (projectTask.getStatus() == null || projectTask.getStatus().isBlank()) {
-                projectTask.setStatus("TO_DO");
-            }
-            return projectTaskRepository.save(projectTask);
-        } catch (Exception e) {
-            throw new ProjectNotFoundException("Project with ID: " + projectIdentifier + " Not Found.");
-        }
+            if (projectTask.getStatus() == null || projectTask.getStatus().isBlank())
+                projectTask.setStatus(EStatus.TO_DO.toString());
+
+            projectTaskRepository.save(projectTask);
     }
 
-    public Set<ProjectTask> findBacklogByProjectIdentifier(String projectIdentifier, String username) {
-
+    public Set<ProjectTaskDto> findBacklogByProjectIdentifier(String projectIdentifier, String username) {
         projectService.findProjectByProjectIdentifier(projectIdentifier, username);
-        return projectTaskRepository.findProjectTaskByProjectIdentifierOrderByPriority(projectIdentifier);
+        return projectTaskMapper
+                .getAllProjectTasksDto(
+                        projectTaskRepository
+                                .findProjectTaskByProjectIdentifierOrderByPriority(projectIdentifier));
     }
 
-    public ProjectTask findProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence, String username) {
-
-        //make sure that searching for existing backlog
+    public ProjectTaskDto findProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence, String username) {
         projectService.findProjectByProjectIdentifier(projectIdentifier, username);
+        ProjectTaskDto task = getProjectTaskDto(projectTaskSequence);
 
-        //make sure that task exist
-        ProjectTask task = projectTaskRepository.findProjectTaskByProjectSequence(projectTaskSequence);
-        if (task == null) {
-            throw new ProjectNotFoundException("Project Task '" + projectTaskSequence + "' not found.");
-        }
-
-        //make sure that project task correspondents to right project
-        if (!task.getProjectIdentifier().equals(projectIdentifier)) {
-            throw new ProjectNotFoundException("Project Task '" + projectTaskSequence + "' doesn't exists in project : " + projectIdentifier);
-        }
+        if (!task.getProjectIdentifier().equals(projectIdentifier))
+            throw new TaskNotFoundException(PROJECT_TASK_DOESNT_EXISTS_IN_PROJECT + projectIdentifier);
 
         return task;
     }
 
-    public ProjectTask updateProjectTask(ProjectTask updatedProjectTask, String projectIdentifier, String projectTaskSequence, String username) {
-
-        ProjectTask task = findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, username);
+    public void updateProjectTask(ProjectTaskDto updatedProjectTask, String projectIdentifier, String projectTaskSequence, String username) {
+        ProjectTask task =
+                projectTaskMapper
+                        .getProjectTask(
+                                findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, username));
 
         task.setAcceptanceCriteria(updatedProjectTask.getAcceptanceCriteria());
         task.setPriority(updatedProjectTask.getPriority());
         task.setStatus(updatedProjectTask.getStatus());
         task.setSummary(updatedProjectTask.getSummary());
-        return projectTaskRepository.save(task);
+        task.setDueDate(updatedProjectTask.getDueDate());
+        projectTaskRepository.save(task);
     }
 
-    public void deleteProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence, String username) {
-        projectTaskRepository.delete(findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, username));
+    public boolean deleteProjectTaskByProjectTaskSequence(String projectIdentifier, String projectTaskSequence, String username) {
+        boolean success = false;
+        Optional<ProjectTask> task = projectTaskRepository.findProjectTaskByProjectSequence(projectTaskSequence);
+
+        if (task.isPresent()) {
+            if (task.get().getProjectIdentifier().equals(projectIdentifier) && task.get().getBacklog().getProject().getProjectLeader().getUsername().equals(username)) {
+                success =true;
+                projectTaskRepository.delete(task.get());
+            }
+        }
+
+        return success;
     }
+
+    private int calculateProjectTaskSequence(Backlog backlog) {
+        int backlogSequence = backlog.getPTSequence();
+        backlogSequence++;
+        return backlogSequence;
+    }
+
+    private ProjectTask getProjectTask(String projectTaskSequence) {
+        return projectTaskRepository
+                .findProjectTaskByProjectSequence(projectTaskSequence)
+                .orElseThrow(() -> new TaskNotFoundException(PROJECT_TASK_NOT_FOUND_MSG));
+    }
+
+    private ProjectTaskDto getProjectTaskDto(String projectTaskSequence) {
+        return projectTaskMapper.getProjectTaskDto(getProjectTask(projectTaskSequence));
+    }
+
 }
