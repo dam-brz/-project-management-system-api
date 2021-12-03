@@ -35,7 +35,7 @@ class UserControllerTest extends TestHelper {
     @ParameterizedTest
     @MethodSource("getInvalidUsersAsJson")
     void testRegisterShouldReturnBadRequest(String arg) throws Exception {
-        userRepository.save(createValidSampleUser());
+        performRegister(getValidUserAsJsonString());
         performRegister(arg).andExpect(status().isBadRequest());
     }
 

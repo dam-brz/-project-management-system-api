@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 import static com.dambrz.projectmanagementsystemapi.exceptions.ExceptionMessageContent.*;
 
@@ -55,12 +56,14 @@ public class ProjectService {
     }
 
     public boolean delete(String projectIdentifier, String username) {
-        Project project = findProjectByProjectIdentifier(projectIdentifier);
         boolean success = false;
+        Optional<Project> project = projectRepository.findByProjectIdentifier(projectIdentifier);
 
-        if (project.getProjectLeader().getUsername().equals(username)) {
-            success = true;
-            projectRepository.delete(project);
+        if (project.isPresent()) {
+            if (project.get().getProjectLeader().getUsername().equals(username)) {
+                success = true;
+                projectRepository.delete(project.get());
+            }
         }
 
         return success;
