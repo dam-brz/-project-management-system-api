@@ -6,7 +6,6 @@ import com.dambrz.projectmanagementsystemapi.payload.response.JWTLoginSuccessRes
 import com.dambrz.projectmanagementsystemapi.payload.request.LoginRequest;
 import com.dambrz.projectmanagementsystemapi.security.JWTProvider;
 import com.dambrz.projectmanagementsystemapi.service.UserService;
-import com.dambrz.projectmanagementsystemapi.validator.PasswordValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,20 +29,20 @@ import static com.dambrz.projectmanagementsystemapi.security.SecurityConstraints
 public class UserController {
 
     private final UserService userService;
-    private final PasswordValidator passwordValidator;
+    //private final PasswordValidator passwordValidator;
     private final JWTProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
 
-    public UserController(UserService userService, PasswordValidator passwordValidator, JWTProvider tokenProvider, AuthenticationManager authenticationManager) {
+    public UserController(UserService userService/*, PasswordValidator passwordValidator*/, JWTProvider tokenProvider, AuthenticationManager authenticationManager) {
         this.userService = userService;
-        this.passwordValidator = passwordValidator;
+        //this.passwordValidator = passwordValidator;
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest registrationRequest , BindingResult result) {
-        passwordValidator.validate(registrationRequest, result);
+        //passwordValidator.validate(registrationRequest, result);
         if (result.hasErrors()) throw new RequestValidationException(result);
         return new ResponseEntity<>(userService.save(registrationRequest), HttpStatus.CREATED);
     }

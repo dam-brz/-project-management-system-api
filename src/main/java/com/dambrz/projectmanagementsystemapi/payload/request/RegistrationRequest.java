@@ -1,9 +1,12 @@
 package com.dambrz.projectmanagementsystemapi.payload.request;
 
+import com.dambrz.projectmanagementsystemapi.validation.annotation.Password;
+import com.dambrz.projectmanagementsystemapi.validation.annotation.PasswordValueMatch;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
+@PasswordValueMatch(field = "password", fieldMatch = "confirmPassword")
 public class RegistrationRequest {
 
     @Email(message = "Username needs to be an email")
@@ -13,12 +16,10 @@ public class RegistrationRequest {
     @NotBlank(message = "Please enter full name")
     private final String fullName;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Use min 6 characters")
+    @Password
     private final String password;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Use min 6 characters")
+    @Password
     private final String confirmPassword;
 
     public RegistrationRequest(String username, String fullName, String password, String confirmPassword) {
