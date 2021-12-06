@@ -1,11 +1,14 @@
 package com.dambrz.projectmanagementsystemapi.exceptions.response;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+public class UsernameAlreadyExistsResponse {
 
-public class UsernameAlreadyExistsResponse extends ResponseEntity {
+    private String username;
 
-    public UsernameAlreadyExistsResponse(Object body, HttpStatus status) {
-        super(body, status);
+    public UsernameAlreadyExistsResponse(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

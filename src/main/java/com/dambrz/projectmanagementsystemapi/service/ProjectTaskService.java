@@ -1,5 +1,6 @@
 package com.dambrz.projectmanagementsystemapi.service;
 
+import com.dambrz.projectmanagementsystemapi.exceptions.exception.DateException;
 import com.dambrz.projectmanagementsystemapi.exceptions.exception.ProjectNotFoundException;
 import com.dambrz.projectmanagementsystemapi.exceptions.exception.TaskNotFoundException;
 import com.dambrz.projectmanagementsystemapi.mapper.ProjectTaskMapper;
@@ -13,6 +14,7 @@ import com.dambrz.projectmanagementsystemapi.payload.request.CreateProjectTaskRe
 import com.dambrz.projectmanagementsystemapi.repository.ProjectTaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,6 +40,10 @@ public class ProjectTaskService {
                 throw new ProjectNotFoundException(PROJECT_NOT_FOUND_IN_YOUR_ACCOUNT_MSG);
 
             ProjectTask projectTask = projectTaskMapper.getProjectTask(createProjectTaskRequest);
+
+        if (projectTask.getDueDate().getTime() < new Date().getTime())
+            throw new DateException(DUE_DATE_CANNOT_BE_BEFORE_NOW);
+
             Backlog backlog = project.getBacklog();
 
             int sequence = calculateProjectTaskSequence(backlog);
@@ -79,6 +85,9 @@ public class ProjectTaskService {
                         .getProjectTask(
                                 findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, username));
 
+        if (updatedProjectTask.getDueDate().getTime() < new Date().getTime())
+            throw new DateException(DUE_DATE_CANNOT_BE_BEFORE_NOW);
+
         task.setAcceptanceCriteria(updatedProjectTask.getAcceptanceCriteria());
         task.setPriority(updatedProjectTask.getPriority());
         task.setStatus(updatedProjectTask.getStatus());
@@ -91,11 +100,10 @@ public class ProjectTaskService {
         boolean success = false;
         Optional<ProjectTask> task = projectTaskRepository.findProjectTaskByProjectSequence(projectTaskSequence);
 
-        if (task.isPresent()) {
-            if (task.get().getProjectIdentifier().equals(projectIdentifier) && task.get().getBacklog().getProject().getProjectLeader().getUsername().equals(username)) {
-                success =true;
-                projectTaskRepository.delete(task.get());
-            }
+        if (task.isPresent() && task.get().getProjectIdentifier().equals(projectIdentifier) &&
+                task.get().getBacklog().getProject().getProjectLeader().getUsername().equals(username)) {
+            success =true;
+            projectTaskRepository.delete(task.get());
         }
 
         return success;

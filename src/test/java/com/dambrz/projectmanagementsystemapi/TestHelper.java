@@ -31,7 +31,7 @@ public abstract class TestHelper {
 
     protected String getValidUserAsJsonString() {
         return "{\"username\":\"sample@user.com\",\"fullName\":\"Sample User\"," +
-                "\"password\":\"password\",\"confirmPassword\":\"password\"}";
+                "\"password\":\"Sample1!\",\"confirmPassword\":\"Sample1!\"}";
     }
 
     protected static Stream<String> getInvalidUsersAsJson() {
@@ -49,7 +49,7 @@ public abstract class TestHelper {
     }
 
     protected String getValidLoginRequestAsJsonString() {
-        return "{\"username\":\"sample@user.com\",\"password\":\"password\"}";
+        return "{\"username\":\"sample@user.com\",\"password\":\"Sample1!\"}";
     }
 
     protected static Stream<String> getInvalidLoginRequestsAsJson() {
@@ -63,20 +63,23 @@ public abstract class TestHelper {
     }
 
     protected String getValidProjectAsJsonString() {
-        return "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"TEST\",\"description\":\"Test description\"}";
+        return "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}";
     }
 
     protected static Stream<String> getInvalidProjectsAsJson() {
         return Stream.of(
-                "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"\",\"description\":\"Test description\"}",
-                "{\"projectIdentifier\":\"TEST2\",\"description\":\"Test description\"}",
-                "{\"projectIdentifier\":\"TEST3\",\"projectName\":\"TEST\",\"description\":\"\"}",
-                "{\"projectIdentifier\":\"TEST4\",\"projectName\":\"}",
-                "{\"projectIdentifier\":\"\",\"projectName\":\"TEST\",\"description\":\"Test description\"}",
-                "{\"projectName\":\"TEST\",\"description\":\"Test description\"}",
-                "{\"projectIdentifier\":\"TES\",\"projectName\":\"TEST\",\"description\":\"Test description\"}",
-                "{\"projectIdentifier\":\"TEST1020200\",\"projectName\":\"TEST\",\"description\":\"Test description\"}",
-                "{\"projectIdentifier\":\"TEST\",\"projectName\":\"TEST\",\"description\":\"Test description\"}"
+                "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"\",\"description\":\"Test description\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectIdentifier\":\"TEST2\",\"description\":\"Test description\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectIdentifier\":\"TEST3\",\"projectName\":\"TEST\",\"description\":\"\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectIdentifier\":\"TEST4\",\"projectName\":\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectIdentifier\":\"\",\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectIdentifier\":\"TES\",\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectIdentifier\":\"TEST1020200\",\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectIdentifier\":\"TEST\",\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"2021-11-11\",\"startDate\":\"2021-11-10\"}",
+                "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"2021-11-10\",\"startDate\":\"2021-11-14\"}",
+                "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"student\",\"startDate\":\"2021-11-14\"}",
+                "{\"projectIdentifier\":\"TEST1\",\"projectName\":\"TEST\",\"description\":\"Test description\",\"endDate\":\"2021-11-14\",\"startDate\":\"student\"}"
 
 
         );

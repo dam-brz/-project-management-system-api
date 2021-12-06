@@ -1,5 +1,6 @@
 package com.dambrz.projectmanagementsystemapi.service;
 
+import com.dambrz.projectmanagementsystemapi.exceptions.exception.DateException;
 import com.dambrz.projectmanagementsystemapi.exceptions.exception.ProjectIdException;
 import com.dambrz.projectmanagementsystemapi.exceptions.exception.ProjectNotFoundException;
 import com.dambrz.projectmanagementsystemapi.mapper.ProjectMapper;
@@ -12,6 +13,8 @@ import com.dambrz.projectmanagementsystemapi.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +34,11 @@ public class ProjectService {
     }
 
     public void save(CreateProjectRequest createProjectRequest, String username) {
-        if (isProjectIdentifierExists(createProjectRequest.getProjectIdentifier()))
+        if (createProjectRequest.getEndDate().getTime() < new Date().getTime())
+            throw new DateException(END_DATE_CANNOT_BE_BEFORE_NOW);
+        else if (createProjectRequest.getStartDate().getTime() < new Date().getTime())
+            throw new DateException(START_DATE_CANNOT_BE_BEFORE_NOW);
+        else if (isProjectIdentifierExists(createProjectRequest.getProjectIdentifier()))
             throw new ProjectIdException(PROJECT_IDENTIFIER_ALREADY_EXISTS_MSG);
         else projectRepository.save(createProject(createProjectRequest, username));
     }
@@ -71,6 +78,9 @@ public class ProjectService {
 
     public void update(String projectIdentifier, ProjectDto updatedProject, String username) {
         Project projectToUpdate = findProjectByProjectIdentifier(projectIdentifier);
+
+        if (projectToUpdate.getEndDate().getTime() < new Date().getTime())
+            throw new DateException(END_DATE_CANNOT_BE_BEFORE_NOW);
 
         if (!projectToUpdate.getProjectLeader().getUsername().equals(username))
             throw new ProjectNotFoundException(PROJECT_NOT_FOUND_IN_YOUR_ACCOUNT_MSG);

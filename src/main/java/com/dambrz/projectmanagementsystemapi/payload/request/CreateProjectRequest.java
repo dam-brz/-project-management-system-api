@@ -1,12 +1,15 @@
 package com.dambrz.projectmanagementsystemapi.payload.request;
 
+import com.dambrz.projectmanagementsystemapi.validation.annotation.DateValue;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+@DateValue(field = "startDate", fieldMatch = "endDate", message = "Start date should not by before end date.")
 public class CreateProjectRequest {
 
     @NotBlank(message = "Project name is required")
@@ -20,9 +23,11 @@ public class CreateProjectRequest {
     @NotBlank(message = "Project description is required")
     private final String description;
 
+    @NotNull(message = "Start date is required")
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date startDate;
 
+    @NotNull(message = "End date is required")
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date endDate;
 

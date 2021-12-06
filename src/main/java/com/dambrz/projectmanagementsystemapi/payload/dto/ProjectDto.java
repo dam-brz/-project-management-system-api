@@ -1,11 +1,13 @@
 package com.dambrz.projectmanagementsystemapi.payload.dto;
 
+import com.dambrz.projectmanagementsystemapi.validation.annotation.DateValue;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+@DateValue(field = "startDate", fieldMatch = "endDate", message = "Start date should not by before end date.")
 public class ProjectDto {
 
     private Long id;
@@ -21,6 +23,7 @@ public class ProjectDto {
     private String description;
 
     private String projectLeader;
+
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date startDate;
 
