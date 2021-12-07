@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.dambrz.projectmanagementsystemapi.exceptions.ExceptionMessageContent.*;
+import static com.dambrz.projectmanagementsystemapi.service.ProjectService._23H;
 
 @Service
 public class ProjectTaskService {
@@ -34,31 +35,31 @@ public class ProjectTaskService {
     }
 
     public void save(String projectIdentifier, CreateProjectTaskRequest createProjectTaskRequest, String username) {
-            Project project = projectService.findProjectByProjectIdentifier(projectIdentifier);
+        Project project = projectService.findProjectByProjectIdentifier(projectIdentifier);
 
-            if (!project.getProjectLeader().getUsername().equals(username))
-                throw new ProjectNotFoundException(PROJECT_NOT_FOUND_IN_YOUR_ACCOUNT_MSG);
+        if (!project.getProjectLeader().getUsername().equals(username))
+            throw new ProjectNotFoundException(PROJECT_NOT_FOUND_IN_YOUR_ACCOUNT_MSG);
 
-            ProjectTask projectTask = projectTaskMapper.getProjectTask(createProjectTaskRequest);
+        ProjectTask projectTask = projectTaskMapper.getProjectTask(createProjectTaskRequest);
 
-        if (projectTask.getDueDate().getTime() < new Date().getTime())
+        if (projectTask.getDueDate().getTime() + _23H < new Date().getTime())
             throw new DateException(DUE_DATE_CANNOT_BE_BEFORE_NOW);
 
-            Backlog backlog = project.getBacklog();
+        Backlog backlog = project.getBacklog();
 
-            int sequence = calculateProjectTaskSequence(backlog);
-            backlog.setPTSequence(sequence);
-            projectTask.setBacklog(backlog);
-            projectTask.setProjectSequence(projectIdentifier + "-" + sequence);
-            projectTask.setProjectIdentifier(projectIdentifier);
+        int sequence = calculateProjectTaskSequence(backlog);
+        backlog.setPTSequence(sequence);
+        projectTask.setBacklog(backlog);
+        projectTask.setProjectSequence(projectIdentifier + "-" + sequence);
+        projectTask.setProjectIdentifier(projectIdentifier);
 
-            if (projectTask.getPriority() == null || projectTask.getPriority() == EPriority.NOT_SELECTED.getPriorityCode())
-                projectTask.setPriority(EPriority.HIGH.getPriorityCode());
+        if (projectTask.getPriority() == null || projectTask.getPriority() == EPriority.NOT_SELECTED.getPriorityCode())
+            projectTask.setPriority(EPriority.HIGH.getPriorityCode());
 
-            if (projectTask.getStatus() == null || projectTask.getStatus().isBlank())
-                projectTask.setStatus(EStatus.TO_DO.toString());
+        if (projectTask.getStatus() == null || projectTask.getStatus().isBlank())
+            projectTask.setStatus(EStatus.TO_DO.toString());
 
-            projectTaskRepository.save(projectTask);
+        projectTaskRepository.save(projectTask);
     }
 
     public Set<ProjectTaskDto> findProjectBacklog(String projectIdentifier, String username) {
@@ -85,7 +86,7 @@ public class ProjectTaskService {
                         .getProjectTask(
                                 findProjectTaskByProjectTaskSequence(projectIdentifier, projectTaskSequence, username));
 
-        if (updatedProjectTask.getDueDate().getTime() < new Date().getTime())
+        if ((updatedProjectTask.getDueDate().getTime() + _23H) < new Date().getTime())
             throw new DateException(DUE_DATE_CANNOT_BE_BEFORE_NOW);
 
         task.setAcceptanceCriteria(updatedProjectTask.getAcceptanceCriteria());
