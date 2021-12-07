@@ -13,7 +13,6 @@ import com.dambrz.projectmanagementsystemapi.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +22,7 @@ import static com.dambrz.projectmanagementsystemapi.exceptions.ExceptionMessageC
 @Service
 public class ProjectService {
 
+    public static final int _23H = 86_364_000;
     private final ProjectMapper projectMapper;
     private final ProjectRepository projectRepository;
     private final UserService userService;
@@ -34,9 +34,9 @@ public class ProjectService {
     }
 
     public void save(CreateProjectRequest createProjectRequest, String username) {
-        if (createProjectRequest.getEndDate().getTime() < new Date().getTime())
+        if ((createProjectRequest.getEndDate().getTime() + _23H) < new Date().getTime())
             throw new DateException(END_DATE_CANNOT_BE_BEFORE_NOW);
-        else if (createProjectRequest.getStartDate().getTime() < new Date().getTime())
+        else if ((createProjectRequest.getStartDate().getTime() + _23H) < new Date().getTime())
             throw new DateException(START_DATE_CANNOT_BE_BEFORE_NOW);
         else if (isProjectIdentifierExists(createProjectRequest.getProjectIdentifier()))
             throw new ProjectIdException(PROJECT_IDENTIFIER_ALREADY_EXISTS_MSG);
@@ -79,7 +79,7 @@ public class ProjectService {
     public void update(String projectIdentifier, ProjectDto updatedProject, String username) {
         Project projectToUpdate = findProjectByProjectIdentifier(projectIdentifier);
 
-        if (projectToUpdate.getEndDate().getTime() < new Date().getTime())
+        if ((updatedProject.getEndDate().getTime() +_23H) < new Date().getTime())
             throw new DateException(END_DATE_CANNOT_BE_BEFORE_NOW);
 
         if (!projectToUpdate.getProjectLeader().getUsername().equals(username))

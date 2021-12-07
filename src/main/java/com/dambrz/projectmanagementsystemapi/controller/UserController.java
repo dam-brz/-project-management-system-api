@@ -29,20 +29,17 @@ import static com.dambrz.projectmanagementsystemapi.security.SecurityConstraints
 public class UserController {
 
     private final UserService userService;
-    //private final PasswordValidator passwordValidator;
     private final JWTProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
 
-    public UserController(UserService userService/*, PasswordValidator passwordValidator*/, JWTProvider tokenProvider, AuthenticationManager authenticationManager) {
+    public UserController(UserService userService, JWTProvider tokenProvider, AuthenticationManager authenticationManager) {
         this.userService = userService;
-        //this.passwordValidator = passwordValidator;
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest registrationRequest , BindingResult result) {
-        //passwordValidator.validate(registrationRequest, result);
         if (result.hasErrors()) throw new RequestValidationException(result);
         return new ResponseEntity<>(userService.save(registrationRequest), HttpStatus.CREATED);
     }

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-@DateValue(field = "startDate", fieldMatch = "endDate", message = "Start date should not by before end date.")
+@DateValue(field = "startDate", fieldMatch = "endDate", message = "Start date should not by after end date.")
 public class CreateProjectRequest {
 
     @NotBlank(message = "Project name is required")

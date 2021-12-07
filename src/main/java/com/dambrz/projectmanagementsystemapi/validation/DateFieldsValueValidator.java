@@ -26,9 +26,8 @@ public class DateFieldsValueValidator implements ConstraintValidator<DateValue, 
 
         boolean isValid = false;
 
-        if (fieldValue != null && fieldMatch != null) {
-            if (fieldValue.before(fieldMatchValue) || fieldValue.equals(fieldMatchValue))
-            isValid = true;
+        if (fieldValue != null && fieldMatchValue != null) {
+            if (fieldValue.before(fieldMatchValue) || fieldValue.equals(fieldMatchValue)) isValid = true;
         }
 
         if (!isValid) {

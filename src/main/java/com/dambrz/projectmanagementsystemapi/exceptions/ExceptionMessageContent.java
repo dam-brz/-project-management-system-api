@@ -16,5 +16,5 @@ public class ExceptionMessageContent {
     public static final String NOT_COMPATIBLE_DATE_PATTERN = "Not compatible date pattern, should be 'YYYY-MM-DD'";
     public static final String END_DATE_CANNOT_BE_BEFORE_NOW = "End date cannot be before now";
     public static final String DUE_DATE_CANNOT_BE_BEFORE_NOW = "Due date cannot be before now";
-    public static final String START_DATE_CANNOT_BE_BEFORE_NOW = "START date cannot be before now";
+    public static final String START_DATE_CANNOT_BE_BEFORE_NOW = "Start date cannot be before now";
 }
